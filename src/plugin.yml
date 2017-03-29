@@ -1,0 +1,61 @@
+main: com.myronpigna.hearthstone.HearthStone
+version: 1.0
+name: HearthStone
+authors:
+    - Myron-Pigna
+description: Use HearthStone or Hs to return to locations or invite players to them.
+commands:
+    hearthstone:
+        description: Return home.
+        aliases: [hs, hearth]
+        usage: |
+          /<command> [parm] [parm] [parm]
+            /hs - To see your current HearthStone(hs) locations
+            /hs set [name] - To set a HearthStone location with a name
+            /hs delete [name] - To delete a HearthStone location by name
+            /hs invite [player] [name] - To invite a player to your HS location by player name and HS name
+            /hs accept - To accept a HearthStone invite
+            /hs decline - To decline a HearthStone invite
+        permission: hearthstone.use
+
+permissions:
+    hearthstone.*:
+        description: Gives access to all HearthStone commands
+        default: op
+        children:
+            hearthstone.use: true
+            hearthstone.use.other: true
+            hearthstone.locate: true
+            hearthstone.use: true
+    hearthstone.use:
+        description: Allow to teleport to HearthStone locations
+        default: op
+    hearthstone.use.other:
+        description: Allow to teleport to HeathStone locations of other players
+        children:
+            hearthstone.use: true
+        default: op
+    hearthstone.location:
+        description: Number of the amount of locations a player can have
+        default: op
+    hearthstone.set:
+        description: Allow to set locations as HearthStones
+        default: op
+    hearthstone.invite:
+        description: Invite other players to your HearthStone location
+        default: op
+    hearthstone.bypass.cooldown:
+        description: Bypasses the cooldown of using HearthStones
+        default: op
+    hearthstone.bypass.delay:
+        description: Bypasses the delay of using HearthStone
+        default: op
+    hearthstone.bypass.homes:
+        description: Bypasses the amount of HearthStones you can have
+        default: op
+    hearthstone.locate:
+        description: Gets the location of a players HearthStone
+        default: op
+    hearthstone.reset:
+        description: Resets the cooldowns of a player
+        default: op
