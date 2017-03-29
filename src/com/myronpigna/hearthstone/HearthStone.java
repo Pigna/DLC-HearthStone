@@ -25,9 +25,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class HearthStone extends JavaPlugin{
     public ArrayList<PlayerData> playerList = new ArrayList<>();
-    private HashMap<String, Long> currentUsageCooldowns = new HashMap<String, Long>();
-    private HashMap<String, Invite> currentInvites = new HashMap<String, Invite>();
-    private HashMap<String, Integer> rankLocationAmount = new HashMap<String,Integer>();
+    private HashMap<String, Long> currentUsageCooldowns = new HashMap<>();
+    private HashMap<String, Invite> currentInvites = new HashMap<>();
+    private HashMap<String, Integer> rankLocationAmount = new HashMap<>();
     private File playerListFile;
     private YamlConfiguration playerListConfig;
     @Override
@@ -170,24 +170,16 @@ public class HearthStone extends JavaPlugin{
         long seconds = diff / 1000 % 60;  
         long minutes = diff / (60 * 1000) % 60; 
         long hours = diff / (60 * 60 * 1000);
-        if(hours == 0)
-            if(minutes == 0)
-                return seconds + " Sec";
-            else    
-                return minutes + " Min " + seconds + " Sec";
-        else
-            return hours + " Hours " + minutes + " Min " + seconds + " Sec";
+
+        return hours > 0 ? hours + " Hours " + minutes + " Min " + seconds + " Sec" : minutes > 0 ? minutes + " Min " + seconds + " Sec" : seconds + " Sec";
     }
     public void addCooldown(PlayerData pd)
     {
         currentUsageCooldowns.put(pd.getPlayer().getName(), System.currentTimeMillis());
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable()
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () ->
         {
-            public void run()
-            {
-                deleteCooldown(pd.getPlayer().getName());
-                pd.sendMessage("Your HearthStone is no longer in cooldown.");
-            }
+            deleteCooldown(pd.getPlayer().getName());
+            pd.sendMessage("Your HearthStone is no longer in cooldown.");
         }, getTPCooldownTick());
     }
 
@@ -198,9 +190,7 @@ public class HearthStone extends JavaPlugin{
     }
     public Invite getInvite(String pname)
     {
-        if(currentInvites.containsKey(pname))
-            return currentInvites.get(pname);
-        return null;
+        return currentInvites.containsKey(pname) ? currentInvites.get(pname) : null;
     }
     public boolean getInviteExists(String pname, Invite invite)
     {
@@ -214,16 +204,13 @@ public class HearthStone extends JavaPlugin{
     {
         Invite newInvite = new Invite(sender, pTarget, sender.getHomeLocation(locationName), locationName);
         currentInvites.put(pTarget.getPlayer().getName(), newInvite);
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable()
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () ->
         {
-            public void run()
+            //Check invite still there.
+            if(getInviteExists(pTarget.getPlayer().getName(), newInvite))
             {
-                //Check invite still there.
-                if(getInviteExists(pTarget.getPlayer().getName(), newInvite))
-                {
-                    newInvite.InviteExpired();
-                    deleteInvite(pTarget.getPlayer().getName());
-                }
+                newInvite.InviteExpired();
+                deleteInvite(pTarget.getPlayer().getName());
             }
         }, getInviteTimeoutTick());
     }
@@ -236,7 +223,7 @@ public class HearthStone extends JavaPlugin{
     private void createPlayerListFile()
     {
         this.playerListFile = new File(getDataFolder(), "PlayerUsernameUUID.yml");
-        if(playerListFile.exists() == false)
+        if(!playerListFile.exists())
         {
             try
             {

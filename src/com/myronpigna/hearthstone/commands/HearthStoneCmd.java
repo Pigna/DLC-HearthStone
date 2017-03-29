@@ -17,12 +17,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 /**
  *
  * @author myron
  */
 public class HearthStoneCmd implements CommandExecutor{
-    HearthStone hs;
+    private HearthStone hs;
 
     public HearthStoneCmd(HearthStone hs) {
         this.hs = hs;
@@ -51,7 +53,9 @@ public class HearthStoneCmd implements CommandExecutor{
             }
             else if(args.length >= 1)
             {
-                switch(args[0].toLowerCase()){
+                switch(args[0].toLowerCase()){ /*TODO Myron, je hebt teveel code in je switch staan,
+                                                stop een hoop in een methode zo krijg je een beter overzich en raken andere mensen niet in de war van je code.
+                                                + het is beter om te debuggen*/
                     case "set":
                         //Set new Hearthstone
                         if(!sender.hasPermission("hearthstone.set"))
@@ -379,11 +383,7 @@ public class HearthStoneCmd implements CommandExecutor{
     }
 
     private boolean checkOverride(String[] args) {
-        for(String arg : args)
-        {
-            if(arg.contains("!"))
-                return true;
-        }
-        return false;
+
+        return Arrays.stream(args).anyMatch(arg -> arg.contains("!"));
     }
 }
