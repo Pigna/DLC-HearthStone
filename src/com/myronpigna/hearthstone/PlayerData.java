@@ -56,41 +56,41 @@ public class PlayerData
     //World world, float x, float y, float z, double yaw, double pitch
     public boolean setHome(String name)
     {
-        if (hasHome() < hs.getRankLocationAmount(player) || player.hasPermission("hearthstone.bypass.homes"))
+        if (hasHome() >= hs.getRankLocationAmount(player) && !player.hasPermission("hearthstone.bypass.homes"))
         {
-            String safename = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-            Location location = player.getLocation();
-            //Check if home already exists
-            locations.put(safename, location);
-            ArrayList<String> values = new ArrayList<String>();
-            values.add(location.getWorld().getName());
-            values.add(location.getX() + "");
-            values.add(location.getY() + "");
-            values.add(location.getZ() + "");
-            values.add(location.getYaw() + "");
-            values.add(location.getPitch() + "");
-            playerDataConfig.set("location." + safename, values);
-            try
-            {
-                playerDataConfig.save(dataFile);
-            }
-            catch (Exception ex)
-            {
-                Logger logger = hs.getLogger();
-                logger.info("Error saving new home into player file. '" + player.getName() + "' '" + safename + "'");
-                return false;
-            }
-            //Set cooldown on set.
-            SetCooldown(Cooldown.SET);
-            return true;
+            return false;
         }
-        else return false;
+
+        String safename = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        Location location = player.getLocation();
+        //Check if home already exists
+        locations.put(safename, location);
+        ArrayList<String> values = new ArrayList<String>();
+        values.add(location.getWorld().getName());
+        values.add(location.getX() + "");
+        values.add(location.getY() + "");
+        values.add(location.getZ() + "");
+        values.add(location.getYaw() + "");
+        values.add(location.getPitch() + "");
+        playerDataConfig.set("location." + safename, values);
+        try
+        {
+            playerDataConfig.save(dataFile);
+        }
+        catch (Exception ex)
+        {
+            Logger logger = hs.getLogger();
+            logger.info("Error saving new home into player file. '" + player.getName() + "' '" + safename + "'");
+            return false;
+        }
+        //Set cooldown on set.
+        SetCooldown(Cooldown.SET);
+        return true;
     }
 
     public boolean hasHome(String name)
     {
-        if (locations.containsKey(name)) return true;
-        else return false;
+        return locations.containsKey(name);
     }
 
     public int hasHome()
@@ -121,24 +121,22 @@ public class PlayerData
 
     public boolean removeHome(String name)
     {
-        if (hasHome(name))
-        {
-            locations.remove(name);
-            playerDataConfig.set("location." + name, null);
-            try
-            {
-                playerDataConfig.save(dataFile);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            return true;
-        }
-        else
+        if (!hasHome(name))
         {
             return false;
         }
+
+        locations.remove(name);
+        playerDataConfig.set("location." + name, null);
+        try
+        {
+            playerDataConfig.save(dataFile);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        return true;
     }
 
     public void CreateOrLoadFile()
@@ -221,7 +219,9 @@ public class PlayerData
         //TODO: Use cooldown from player file, instead of the hs list. ERROR needs fixing no cooldown ever registrated or check does not work.
         Long cooldown = getCooldown(cd);
         if (hasCooldown(cd) && !player.hasPermission("hearthstone.bypass.cooldown"))
+        {
             sendMessage("Your HearthStone is still in cooldown for " + hs.getTimeRemaining(cooldown) + ".");
+        }
         else
         {
             Location locationBefore = player.getLocation();
@@ -237,10 +237,16 @@ public class PlayerData
                 hs.getServer().getScheduler().scheduleSyncDelayedTask(hs, () ->
                 {
                     //Check movement
-                    if (locationBefore.getX() != player.getLocation().getX() || locationBefore.getY() != player.getLocation().getY() || locationBefore.getZ() != player.getLocation().getZ())
+                    if (locationBefore.getX() != player.getLocation().getX()
+                        || locationBefore.getY() != player.getLocation().getY()
+                        || locationBefore.getZ() != player.getLocation().getZ())
+                    {
                         sendMessage("You have moved. Teleport is canceled.");
+                    }
                     else if (!LocationSafeCheck(l) && !override)
+                    {
                         sendMessage("Location is not safe to teleport to, contact a server Admin to check the location or add a ! after the homename.");
+                    }
                     else
                     {
                         player.teleport(l);
@@ -256,11 +262,21 @@ public class PlayerData
     private boolean LocationSafeCheck(Location loc)
     {
         Location locOther = new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        if (locOther.getBlock().getType() != Material.AIR) return false;
+        if (locOther.getBlock().getType() != Material.AIR)
+        {
+            return false;
+        }
         locOther.setY(locOther.getY() + 1);
-        if (locOther.getBlock().getType() != Material.AIR) return false;
+        if (locOther.getBlock().getType() != Material.AIR)
+        {
+            return false;
+        }
         locOther.setY(locOther.getY() - 2);
-        if (!(locOther.getBlock().getType() == Material.AIR || locOther.getBlock().isLiquid())) return true;
+
+        if (!(locOther.getBlock().getType() == Material.AIR || locOther.getBlock().isLiquid()))
+        {
+            return true;
+        }
         else return false;
     }
 
@@ -292,37 +308,39 @@ public class PlayerData
 
     public boolean hasCooldown(Cooldown cd)
     {
-        if (cd == Cooldown.USAGE)
+        long wait_time;
+
+        switch (cd)
         {
-            return System.currentTimeMillis() <= getUsageCooldown() + (hs.getTPCooldownSec() * 1000);
+            case USAGE:
+                wait_time = getUsageCooldown() + (hs.getTPCooldownSec() * 1000);
+                break;
+            case INVITE:
+                wait_time = getInviteCooldown() + (hs.getSetLocationInviteCooldownSec() * 1000);
+                break;
+            case ACCEPTED:
+                wait_time = getInviteAcceptCooldown() + (hs.getLocationInviteAcceptCooldownSec() * 1000);
+                break;
+            default: //TODO Extend with other cooldowns;
+                return false;
         }
-        if (cd == Cooldown.INVITE)
-        {
-            return System.currentTimeMillis() <= getInviteCooldown() + (hs.getSetLocationInviteCooldownSec() * 1000);
-        }
-        if (cd == Cooldown.ACCEPTED)
-        {
-            return System.currentTimeMillis() <= getInviteAcceptCooldown() + (hs.getLocationInviteAcceptCooldownSec() * 1000);
-        }
-        return false;
-        //TODO: Extend with other cooldowns;
+
+        return System.currentTimeMillis() <= wait_time;
     }
 
     public long getCooldown(Cooldown cd)
     {
-        if (cd == Cooldown.USAGE)
+        switch (cd)
         {
-            return getUsageCooldown();
+            case USAGE:
+                return getUsageCooldown();
+            case INVITE:
+                return getInviteCooldown();
+            case ACCEPTED:
+                return getInviteAcceptCooldown();
+            default:
+                return 0;
         }
-        if (cd == Cooldown.INVITE)
-        {
-            return getInviteCooldown();
-        }
-        if (cd == Cooldown.ACCEPTED)
-        {
-            return getInviteAcceptCooldown();
-        }
-        return 0;
     }
 
     public void resetCooldown()
