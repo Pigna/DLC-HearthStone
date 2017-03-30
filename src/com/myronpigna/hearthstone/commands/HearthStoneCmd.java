@@ -29,6 +29,161 @@ public class HearthStoneCmd implements CommandExecutor{
     public HearthStoneCmd(HearthStone hs) {
         this.hs = hs;
     }
+
+    private void setNewHeartStone(CommandSender sender, String[] args, PlayerData pd)
+    {
+        if(!sender.hasPermission("hearthstone.set"))
+            NoPermission(pd);
+        else if(args.length == 2)
+            if(pd.setHome(args[1]))
+                pd.sendMessage("HearthStone " + args[1] + " is set.");
+            else
+                pd.sendMessage("You have reached your maximum amount of locations.");
+        else
+            pd.sendMessage("Set Syntax : /hs set [name]");
+    }
+
+    private void deleteHeartStone(String[] args, PlayerData pd)
+    {
+        if(args.length == 2)
+        {
+            if (pd.removeHome(args[1]))
+            {
+                pd.sendMessage("HearthStone " + args[1] + " is deleted.");
+            }
+            else
+            {
+                pd.sendMessage("No such HearthStone with that name.");
+            }
+        }
+        else
+        {
+            pd.sendMessage("Delete Syntax : /hs delete [name]");
+        }
+    }
+
+    private void acceptHeartStone(Player player, PlayerData pd)
+    {
+        Invite inviteAccepted = hs.getInvite(player.getName());
+        if(inviteAccepted != null)
+        {
+            if(!pd.hasCooldown(Cooldown.ACCEPTED))
+            {
+                inviteAccepted.InviteAccepted();
+                hs.deleteInvite(player.getName());
+            }
+            else
+            {
+                pd.sendMessage("You have a invite teleport cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.ACCEPTED)));
+            }
+        }
+        else
+            pd.sendMessage("You have no HearthStone invites active.");
+    }
+
+    private void declineHeartStone(Player player, PlayerData pd)
+    {
+        Invite inviteDeclined = hs.getInvite(player.getName());
+        if(inviteDeclined != null)
+        {
+            inviteDeclined.InviteDeclined();
+            hs.deleteInvite(player.getName());
+        }
+        else
+        {
+            pd.sendMessage("You have no HearthStone invites active.");
+        }
+    }
+
+    private void inviteHeartStone(CommandSender sender, String[] args, Player player, PlayerData pd)
+    {
+        if(!sender.hasPermission("hearthstone.invite"))
+        {
+            NoPermission(pd);
+        }
+        else if(args.length == 1)
+        {
+            //show help
+            pd.sendMessage("Invite Syntax : /hs invite [Player name] <HearthStone name>");
+        }
+        else if(args.length == 2)
+        {
+            Player targetPlayer = hs.getServer().getPlayer(args[1]);
+            if(targetPlayer != null)
+            {
+                int amount = pd.hasHome();
+                if(amount > 0)
+                {
+                    if(amount > 1)
+                    {
+                        //error
+                        pd.sendMessage("Give a HearthStone name as parameter.");
+                    }
+                    else if(!pd.hasCooldown(Cooldown.INVITE))
+                    {
+                        SendInvite(targetPlayer, player, pd, pd.getHomeName());
+                    }
+                    else
+                    {
+                        //error
+                        pd.sendMessage("You have a invite cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.INVITE)));
+                    }
+                }
+                else
+                {
+                    //error
+                    pd.sendMessage("You have no set HearthStone to invite someone to.");
+                }
+            }
+            else
+            {
+                pd.sendMessage("Target Player is not online or invalid.");
+            }
+        }
+        else if (args.length == 3)
+        {
+            int amount = pd.hasHome();
+            if(amount > 0)
+            {
+                Player targetPlayer = hs.getServer().getPlayer(args[1]);
+                if(targetPlayer == null)
+                {
+                    //error
+                    pd.sendMessage("No online player named '" + args[1] + "' could be found.");
+                }
+                else if(pd.hasHome(args[2]))
+                {
+                    pd.sendMessage("Invite has been send to '" + targetPlayer.getName() + "'.");
+                    SendInvite(targetPlayer, player, pd, args[2]);
+                }
+                else{
+                    //error
+                    pd.sendMessage("You have no HearthStone named '" + args[2] + "'.");
+                }
+            }
+            else
+            {
+                //error
+                pd.sendMessage("You have no set HearthStone to invite someone to.");
+            }
+        }
+    }
+
+    private void locateHeartStone()
+    {
+
+    }
+
+    private void resetHeartStone()
+    {
+
+    }
+
+    private void defaultHeartStone()
+    {
+
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
     {
@@ -58,52 +213,18 @@ public class HearthStoneCmd implements CommandExecutor{
                                                 + het is beter om te debuggen*/
                     case "set":
                         //Set new Hearthstone
-                        if(!sender.hasPermission("hearthstone.set"))
-                            NoPermission(pd);
-                        else if(args.length == 2)
-                            if(pd.setHome(args[1]))
-                                pd.sendMessage("HearthStone " + args[1] + " is set.");
-                            else
-                                pd.sendMessage("You have reached your maximum amount of locations.");
-                        else
-                            pd.sendMessage("Set Syntax : /hs set [name]");
+                        setNewHeartStone(sender, args, pd);
                         break;
                     case "delete":
                         //Deletes current hearthstone
-                        if(args.length == 2)
-                            if(pd.removeHome(args[1]))
-                                pd.sendMessage("HearthStone " + args[1] + " is deleted.");
-                            else
-                                pd.sendMessage("No such HearthStone with that name.");
-                        else
-                            pd.sendMessage("Delete Syntax : /hs delete [name]");
+                        deleteHeartStone(args, pd);
                         break;
                     case "accept":
-                        Invite inviteAccepted = hs.getInvite(player.getName());
-                        if(inviteAccepted != null)
-                        {
-                            if(!pd.hasCooldown(Cooldown.ACCEPTED))
-                            {
-                                inviteAccepted.InviteAccepted();
-                                hs.deleteInvite(player.getName());
-                            }
-                            else
-                            {
-                                pd.sendMessage("You have a invite teleport cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.ACCEPTED)));
-                            }
-                        }
-                        else
-                            pd.sendMessage("You have no HearthStone invites active.");
+                        //accepts heartstone
+                        acceptHeartStone(player, pd);
                         break;
                     case "decline":
-                        Invite inviteDeclined = hs.getInvite(player.getName());
-                        if(inviteDeclined != null)
-                        {
-                            inviteDeclined.InviteDeclined();
-                            hs.deleteInvite(player.getName());
-                        }
-                        else
-                            pd.sendMessage("You have no HearthStone invites active.");
+                        declineHeartStone(player, pd);
                         break;
                     case "help":
                         //View info about hearthstone
@@ -116,74 +237,7 @@ public class HearthStoneCmd implements CommandExecutor{
                         pd.sendMessage("- /hs info - Information about the creator of the HearthStone plugin");
                         break;
                     case "invite":
-                        if(!sender.hasPermission("hearthstone.invite"))
-                            NoPermission(pd);
-                        else if(args.length == 1)
-                        {
-                            //show help
-                            pd.sendMessage("Invite Syntax : /hs invite [Player name] <HearthStone name>");
-                        }
-                        else if(args.length == 2)
-                        {
-                            Player targetPlayer = hs.getServer().getPlayer(args[1]);
-                            if(targetPlayer != null)
-                            {
-                                int amount = pd.hasHome();
-                                if(amount > 0)
-                                {
-                                    if(amount > 1)
-                                    {
-                                        //error
-                                        pd.sendMessage("Give a HearthStone name as parameter.");
-                                    }
-                                    else if(!pd.hasCooldown(Cooldown.INVITE))
-                                    {
-                                        SendInvite(targetPlayer, player, pd, pd.getHomeName());
-                                    }
-                                    else
-                                    {
-                                        //error
-                                        pd.sendMessage("You have a invite cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.INVITE)));
-                                    }
-                                }
-                                else
-                                {
-                                    //error
-                                    pd.sendMessage("You have no set HearthStone to invite someone to.");
-                                }
-                            }
-                            else
-                            {
-                                pd.sendMessage("Target Player is not online or invalid.");
-                            }
-                        }
-                        else if (args.length == 3)
-                        {
-                            int amount = pd.hasHome();
-                            if(amount > 0)
-                            {
-                                Player targetPlayer = hs.getServer().getPlayer(args[1]);
-                                if(targetPlayer == null)
-                                {
-                                    //error
-                                    pd.sendMessage("No online player named '" + args[1] + "' could be found.");
-                                }
-                                else if(pd.hasHome(args[2]))
-                                {
-                                    pd.sendMessage("Invite has been send to '" + targetPlayer.getName() + "'.");
-                                    SendInvite(targetPlayer, player, pd, args[2]);
-                                }
-                                else{
-                                    //error
-                                    pd.sendMessage("You have no HearthStone named '" + args[2] + "'.");
-                                }                           
-                            }
-                            else
-                            {
-                                //error
-                                pd.sendMessage("You have no set HearthStone to invite someone to.");
-                            }
-                        }
+                        inviteHeartStone(sender,args,player,pd);
                         break;
                     case "request":
                         //TODO: Send request to player to go to his home
