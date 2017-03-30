@@ -26,7 +26,7 @@ public class PlayerJoin implements Listener{
         //Load data from file and add player to playerlist
         hs.playerList.add(new PlayerData(event.getPlayer(),hs));
         //Set the player in the PlayerListFile if not in it already
-        if(hs.getUUIDfromPlayerListFile(event.getPlayer().getUniqueId().toString()).equals(null))
+        if(hs.getUUIDfromPlayerListFile(event.getPlayer().getUniqueId().toString()) == null)
         {
             hs.addtoPlayerListFile(event.getPlayer());
         }

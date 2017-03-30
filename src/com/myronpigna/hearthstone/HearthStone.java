@@ -238,7 +238,7 @@ public class HearthStone extends JavaPlugin{
     }
     public void addtoPlayerListFile(Player player)
     {
-        playerListConfig.set("players." + player, player.getUniqueId());
+        playerListConfig.set("players." + player.getName(), player.getUniqueId().toString());
         try
         {
             playerListConfig.save(playerListFile); 
@@ -251,11 +251,14 @@ public class HearthStone extends JavaPlugin{
     }
     public UUID getUUIDfromPlayerListFile(String playerName)
     {
-        for(String name : playerListConfig.getConfigurationSection("players").getKeys(false))
+        if(playerListConfig.getConfigurationSection("players") != null)
         {
-            if(name.equalsIgnoreCase(playerName))
+            for(String name : playerListConfig.getConfigurationSection("players").getKeys(false))
             {
-                return UUID.fromString(playerListConfig.getString("players." + playerName));
+                if(name.equalsIgnoreCase(playerName))
+                {
+                    return UUID.fromString(playerListConfig.getString("players." + playerName));
+                }
             }
         }
         return null;

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.bukkit.OfflinePlayer;
 
 /**
  * @author myron
@@ -40,9 +41,16 @@ public class PlayerData
         this.hs = hs;
         this.pluginFolder = hs.getDataFolder();
         this.dataFile = new File(pluginFolder, player.getUniqueId() + ".yml");
-        CreateOrLoadFile();
+        CreateFile();
+        LoadFile();
     }
-
+    public PlayerData(OfflinePlayer offlinePlayer, HearthStone hs)
+    {
+        this.hs = hs;
+        this.pluginFolder = hs.getDataFolder();
+        this.dataFile = new File(pluginFolder, offlinePlayer.getUniqueId() + ".yml");
+        LoadFile();
+    }
     public Player getPlayer()
     {
         return player;
@@ -139,7 +147,7 @@ public class PlayerData
         return true;
     }
 
-    public void CreateOrLoadFile()
+    public void CreateFile()
     {
         if (!pluginFolder.exists())
         {
@@ -164,7 +172,7 @@ public class PlayerData
             }
         }
         playerDataConfig = YamlConfiguration.loadConfiguration(dataFile);
-        playerDataConfig.set("Player", player.getPlayer());
+        playerDataConfig.set("Player", player.getName());
         try
         {
             playerDataConfig.save(dataFile);
@@ -174,35 +182,43 @@ public class PlayerData
             Logger logger = hs.getLogger();
             logger.info("Error updating player name on load.");
         }
-        //Load the locations and add them to the list
-        if (playerDataConfig.getConfigurationSection("location") != null)
+    }
+    public void LoadFile()
+    {
+        if (dataFile.exists())
         {
-            for (String lName : playerDataConfig.getConfigurationSection("location").getKeys(false))
+            playerDataConfig = YamlConfiguration.loadConfiguration(dataFile);
+            //Load the locations and add them to the list
+            if (playerDataConfig.getConfigurationSection("location") != null)
             {
-                ArrayList<String> lInfo = (ArrayList<String>) playerDataConfig.getStringList("location." + lName);
-                World world = hs.getServer().getWorld(lInfo.get(0));
-                if (world != null)
+                for (String lName : playerDataConfig.getConfigurationSection("location").getKeys(false))
                 {
-                    Location location = new Location(hs.getServer().getWorld(lInfo.get(0)), Double.parseDouble(lInfo.get(1)), Double.parseDouble(lInfo.get(2)), Double.parseDouble(lInfo.get(3)), Float.parseFloat(lInfo.get(4)), Float.parseFloat(lInfo.get(5)));
-                    locations.put(lName, location);
-                }
-                else
-                {
-                    playerDataConfig.set("location." + lName, null);
-                    try
+                    ArrayList<String> lInfo = (ArrayList<String>) playerDataConfig.getStringList("location." + lName);
+                    World world = hs.getServer().getWorld(lInfo.get(0));
+                    if (world != null)
                     {
-                        playerDataConfig.save(dataFile);
+                        Location location = new Location(hs.getServer().getWorld(lInfo.get(0)), Double.parseDouble(lInfo.get(1)), Double.parseDouble(lInfo.get(2)), Double.parseDouble(lInfo.get(3)), Float.parseFloat(lInfo.get(4)), Float.parseFloat(lInfo.get(5)));
+                        locations.put(lName, location);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Logger logger = hs.getLogger();
-                        logger.info("Error removing location from non-existing world from saved hearthstones.");
+                        playerDataConfig.set("location." + lName, null);
+                        try
+                        {
+                            playerDataConfig.save(dataFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger logger = hs.getLogger();
+                            logger.info("Error removing location from non-existing world from saved hearthstones.");
+                        }
                     }
                 }
             }
         }
+        else
+            hs.getLogger().info("Error loading player file. File does not exist.");
     }
-
     public void sendMessage(String message)
     {
         player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "HS" + ChatColor.DARK_GRAY + "]" + ChatColor.YELLOW + message);

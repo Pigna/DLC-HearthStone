@@ -254,7 +254,7 @@ public class HearthStoneCmd implements CommandExecutor
                         PlayerData targetPlayerData = hs.getPlayerData(targetPlayer);
                         if (input.length == 1)
                         {
-                            OtherPlayerHomes(targetPlayerData, pd);
+                            OtherPlayerHomes(targetPlayerData, pd, input[0]);
                         }
                         else if (!targetPlayerData.hasHome(input[1]))
                         {
@@ -267,8 +267,7 @@ public class HearthStoneCmd implements CommandExecutor
                     }
                     else
                     {
-                        //TODO: check if a null uuid to a offlineplayer can give a error - if so fix
-                        OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(args[1]));
+                        OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(input[0]));
                         if (targetOfflinePlayer == null)
                         {
                             pd.sendMessage("No player with that name exists.");
@@ -279,10 +278,10 @@ public class HearthStoneCmd implements CommandExecutor
                         }
                         else
                         {
-                            PlayerData targetPlayerData = hs.getPlayerData((Player) targetOfflinePlayer);
+                            PlayerData targetPlayerData = new PlayerData(targetOfflinePlayer, hs);
                             if (input.length == 1)
                             {
-                                OtherPlayerHomes(targetPlayerData, pd);
+                                OtherPlayerHomes(targetPlayerData, pd, input[0]);
                             }
                             else if (!targetPlayerData.hasHome(input[1]))
                             {
@@ -419,16 +418,16 @@ public class HearthStoneCmd implements CommandExecutor
         hs.addInvite(targetpd, pd, name);
     }
 
-    private void OtherPlayerHomes(PlayerData tpd, PlayerData pd)
+    private void OtherPlayerHomes(PlayerData tpd, PlayerData pd, String playername)
     {
         String ClickableHearthStoneList = "\"\"";
         //displays list of homes and help
         for (String s : tpd.getHomes().keySet())
         {
-            ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + tpd.getPlayer().getName() + ":" + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + " from " + tpd.getPlayer().getName() + ".\"}]}}}";
+            ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + playername + ":" + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + " from " + playername + ".\"}]}}}";
         }
         PacketPlayOutChat packet = new PacketPlayOutChat(ChatSerializer.a("[" + ClickableHearthStoneList + "]"));
-        pd.sendMessage(tpd.getPlayer().getName() + "'s current HearthStone's are:");
+        pd.sendMessage(playername + "'s current HearthStone's are:");
         pd.sendChatPacket(packet);
     }
 
