@@ -39,7 +39,7 @@ public class HearthStoneCmd implements CommandExecutor
         else pd.sendMessage("Set Syntax : /hs set [name]");
     }
 
-    private void deleteHeartStone(String[] args, PlayerData pd)
+    private void deleteHearthStone(String[] args, PlayerData pd)
     {
         if (args.length == 2)
         {
@@ -58,14 +58,15 @@ public class HearthStoneCmd implements CommandExecutor
         }
     }
 
-    private void acceptHeartStone(Player player, PlayerData pd)
+    private void acceptHeartStone(String[] args, Player player, PlayerData pd)
     {
+        boolean override = checkOverride(args);
         Invite inviteAccepted = hs.getInvite(player.getName());
         if (inviteAccepted != null)
         {
             if (!pd.hasCooldown(Cooldown.ACCEPTED))
             {
-                inviteAccepted.InviteAccepted();
+                inviteAccepted.InviteAccepted(override);
                 hs.deleteInvite(player.getName());
             }
             else
@@ -241,7 +242,7 @@ public class HearthStoneCmd implements CommandExecutor
     private void defaultHeartStone(String[] args, Player player, PlayerData pd) //TODO hak dit op in kleinere methodes
     {
         boolean override = checkOverride(args);
-        if (args.length == 1)
+        if (args.length == 1 || (args.length == 2 && override))
         {
             if (args[0].indexOf(":") > 0)//check position off.
             {
@@ -262,7 +263,7 @@ public class HearthStoneCmd implements CommandExecutor
                         }
                         else
                         {
-                            pd.teleportPlayerLocation(targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
+                            pd.teleportPlayerLocation(input[1],targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
                         }
                     }
                     else
@@ -289,7 +290,7 @@ public class HearthStoneCmd implements CommandExecutor
                             }
                             else
                             {
-                                pd.teleportPlayerLocation(targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
+                                pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
                             }
                         }
                     }
@@ -301,7 +302,7 @@ public class HearthStoneCmd implements CommandExecutor
             }
             else if (pd.hasHome(args[0]))
             {
-                pd.teleportPlayerLocation(pd.getHomeLocation(args[0]), Cooldown.USAGE, override);
+                pd.teleportPlayerLocation(args[0], pd.getHomeLocation(args[0]), Cooldown.USAGE, override);
             }
             else // error
             {
@@ -310,7 +311,7 @@ public class HearthStoneCmd implements CommandExecutor
         }
         else if (pd.hasHome() == 1)
         {
-            pd.teleportPlayerLocation(pd.getHomeLocation(), Cooldown.USAGE, override);
+            pd.teleportPlayerLocation(args[0], pd.getHomeLocation(), Cooldown.USAGE, override);
         }
         else if (pd.hasHome() > 1) //error
         {
@@ -354,20 +355,22 @@ public class HearthStoneCmd implements CommandExecutor
         if (args.length >= 1)
         {
             switch (args[0].toLowerCase())
-            { /*TODO Myron, je hebt teveel code in je switch staan,
-                                                stop een hoop in een methode zo krijg je een beter overzich en raken andere mensen niet in de war van je code.
-                                                + het is beter om te debuggen*/
+            {
                 case "set":
                     //Set new Hearthstone
                     setNewHeartStone(sender, args, pd);
                     break;
                 case "delete":
                     //Deletes current hearthstone
-                    deleteHeartStone(args, pd);
+                    deleteHearthStone(args, pd);
+                    break;
+                case "del":
+                    //Alias for delete
+                    deleteHearthStone(args, pd);
                     break;
                 case "accept":
                     //accepts heartstone
-                    acceptHeartStone(player, pd);
+                    acceptHeartStone(args, player, pd);
                     break;
                 case "decline":
                     declineHeartStone(player, pd);

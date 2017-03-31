@@ -46,11 +46,11 @@ public class Invite implements Comparable<Invite>{
         reciever.sendMessage(getSender().getName() + "'s invite to " + locationName + " has expired.");
         sender.sendMessage("Your invite to " + getReciever().getName() + " has expired.");
     }
-    public void InviteAccepted()
+    public void InviteAccepted(boolean override)
     {
         reciever.sendMessage("You have accepted the HearthStone invite from " + getSender().getName() + ".");
         sender.sendMessage(getReciever().getName() + " has accepted your HearthStone invite.");
-        reciever.teleportPlayerLocation(location, Cooldown.ACCEPTED, false);
+        reciever.teleportPlayerLocation(locationName, location, Cooldown.ACCEPTED, override);
         sender.SetCooldown(Cooldown.INVITE);
     }
     public void InviteDeclined()
