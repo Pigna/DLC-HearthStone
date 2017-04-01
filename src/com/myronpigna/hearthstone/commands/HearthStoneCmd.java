@@ -263,7 +263,7 @@ public class HearthStoneCmd implements CommandExecutor
                         }
                         else
                         {
-                            pd.teleportPlayerLocation(input[1],targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
+                            pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
                         }
                     }
                     else

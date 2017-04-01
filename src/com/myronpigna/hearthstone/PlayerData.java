@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import net.minecraft.server.v1_11_R1.IChatBaseComponent;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -48,6 +49,7 @@ public class PlayerData
         CreateFile();
         LoadFile();
     }
+
     public PlayerData(OfflinePlayer offlinePlayer, HearthStone hs)
     {
         this.hs = hs;
@@ -55,6 +57,7 @@ public class PlayerData
         this.dataFile = new File(pluginFolder, offlinePlayer.getUniqueId() + ".yml");
         LoadFile();
     }
+
     public Player getPlayer()
     {
         return player;
@@ -187,6 +190,7 @@ public class PlayerData
             logger.info("Error updating player name on load.");
         }
     }
+
     public void LoadFile()
     {
         if (dataFile.exists())
@@ -220,9 +224,9 @@ public class PlayerData
                 }
             }
         }
-        else
-            hs.getLogger().info("Error loading player file. File does not exist.");
+        else hs.getLogger().info("Error loading player file. File does not exist.");
     }
+
     public void sendMessage(String message)
     {
         player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "HS" + ChatColor.DARK_GRAY + "]" + ChatColor.YELLOW + message);
@@ -241,52 +245,48 @@ public class PlayerData
         if (hasCooldown(cd) && !player.hasPermission("hearthstone.bypass.cooldown"))
         {
             sendMessage("Your HearthStone is still in cooldown for " + hs.getTimeRemaining(cooldown) + ".");
+            return;
         }
-        else
+
+        Location locationBefore = player.getLocation();
+        if (player.hasPermission("hearthstone.bypass.delay"))
         {
-            Location locationBefore = player.getLocation();
-            if (player.hasPermission("hearthstone.bypass.delay"))
+            player.teleport(l);
+            SetCooldown(cd);
+            return;
+        }
+
+        sendMessage("Teleport commencing in " + hs.getTPDelaySec() + " Sec. Please don't move.");
+        //Delay
+        hs.getServer().getScheduler().scheduleSyncDelayedTask(hs, () ->
+        {
+            //Check movement
+            if (locationBefore.getX() != player.getLocation().getX() || locationBefore.getY() != player.getLocation().getY() || locationBefore.getZ() != player.getLocation().getZ())
+            {
+                sendMessage("You have moved. Teleport is canceled.");
+            }
+            else if (!LocationSafeCheck(l) && !override)
+            {
+                sendMessage("HearthStone location is not safe for teleport.");
+                String clickableOverride = "";
+                if (cd == Cooldown.ACCEPTED) //TODO deze strings zijn bijna hetzelfde hak ze op in stukken en doe de ef alleen om het stuk dat anders is
+                {
+                    clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
+                }
+                else
+                {
+                    clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + lname + " !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
+                }
+                PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a(clickableOverride));
+                sendChatPacket(packet);
+            }
+            else
             {
                 player.teleport(l);
                 SetCooldown(cd);
             }
-            else
-            {
-                sendMessage("Teleport commencing in " + hs.getTPDelaySec() + " Sec. Please don't move.");
-                //Delay
-                hs.getServer().getScheduler().scheduleSyncDelayedTask(hs, () ->
-                {
-                    //Check movement
-                    if (locationBefore.getX() != player.getLocation().getX()
-                        || locationBefore.getY() != player.getLocation().getY()
-                        || locationBefore.getZ() != player.getLocation().getZ())
-                    {
-                        sendMessage("You have moved. Teleport is canceled.");
-                    }
-                    else if (!LocationSafeCheck(l) && !override)
-                    {
-                        sendMessage("HearthStone location is not safe for teleport.");
-                        String clickableOverride = "";
-                        if(cd == Cooldown.ACCEPTED)
-                        {
-                            clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
-                        }
-                        else
-                        {
-                            clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + lname + " !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
-                        }
-                        PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a(clickableOverride));
-                        sendChatPacket(packet);
-                    }
-                    else
-                    {
-                        player.teleport(l);
-                        SetCooldown(cd);
-                    }
-                }, hs.getTPDelayTick());
-                //TODO: Check combat on teleport Delay
-            }
-        }
+        }, hs.getTPDelayTick());
+        //TODO: Check combat on teleport Delay
     }
 
     private boolean LocationSafeCheck(Location loc)
@@ -306,77 +306,40 @@ public class PlayerData
             //check underneeth
             locOther.setY(locOther.getY() - 1);
             block = locOther.getBlock();
-            if(!(CheckBlockType(block, Material.AIR) || block.isLiquid()))
-                return true;
-            return false;
+            return !(CheckBlockType(block, Material.AIR) || block.isLiquid());
         }
         //check feet for slabs or stairs or carpet or fence
-        if(IsSlabUnsolid(block))
+        if (IsSlabUnsolid(block))
         {
             //Check above head for air
             locOther.setY(locOther.getY() + 2);
             block = locOther.getBlock();
-            if(CheckBlockType(block, Material.AIR))
-                return true;
-            return false;
+            return CheckBlockType(block, Material.AIR);
         }
-        else return false;
+
+        return false;
         /*
         1 rood is air
         2 bruin is air en oranje is niet liquid of air. DAN MAG JE ER HEEN
         2 of als bruin een block is en niet lava of vuur en geel air. DAN MAG JE ER HEEN
         */
     }
+
     private boolean CheckBlockType(Block block, Material expected)
     {
-        if (block.getType().equals(expected))
-            return true;
-        return false;
+        return block.getType().equals(expected);
     }
+
     private boolean IsSlabUnsolid(Block block)
     {
         Material blockMaterial = block.getType();
         //Solid block
-        if(!blockMaterial.isSolid() && !CheckBlockType(block, (Material.FIRE)))
-            return true;
-        List<Material> materialList = Arrays.asList(
-                Material.WOOD_STEP,
-                Material.WOOD_STAIRS,
-                Material.STONE_SLAB2,
-                Material.ACACIA_STAIRS,
-                Material.SPRUCE_WOOD_STAIRS,
-                Material.DARK_OAK_STAIRS,
-                Material.SNOW,
-                Material.BIRCH_WOOD_STAIRS,
-                Material.JUNGLE_WOOD_STAIRS,
-                Material.IRON_PLATE,
-                Material.WOOD_PLATE,
-                Material.BED,
-                Material.CHEST,
-                Material.CAULDRON,
-                Material.HOPPER,
-                Material.DAYLIGHT_DETECTOR,
-                Material.DAYLIGHT_DETECTOR_INVERTED,
-                Material.TRAP_DOOR,
-                Material.IRON_TRAPDOOR,
-                Material.TRAPPED_CHEST,
-                Material.STONE_PLATE,
-                Material.GOLD_PLATE,
-                Material.SANDSTONE_STAIRS,
-                Material.NETHER_BRICK_STAIRS,
-                Material.PURPUR_SLAB,
-                Material.PURPUR_STAIRS,
-                Material.STEP,
-                Material.SOUL_SAND,
-                Material.GRASS_PATH,
-                Material.SOIL
-        );
-        
-        if (materialList.stream().anyMatch((m) -> (m.equals(blockMaterial)))) {
-            return true;
-        }
-        return false;
+        if (!blockMaterial.isSolid() && !CheckBlockType(block, (Material.FIRE))) return true;
+        List<Material> materialList = Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
+
+        return materialList.stream().anyMatch((m) -> (m.equals(blockMaterial)));
     }
+
     public void SetCooldown(Cooldown cd) //arg 0 use of hearthstone - 1 invite - 2 inviteAccept - 3 setHS - 4 useother
     {
         if (!player.hasPermission("hearthstone.bypass.cooldown"))
@@ -405,7 +368,7 @@ public class PlayerData
 
     public boolean hasCooldown(Cooldown cd)
     {
-        long wait_time;
+        long wait_time;// = getCooldown(cd);
 
         switch (cd)
         {
