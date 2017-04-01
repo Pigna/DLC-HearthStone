@@ -366,7 +366,10 @@ public class PlayerData
                 Material.NETHER_BRICK_STAIRS,
                 Material.PURPUR_SLAB,
                 Material.PURPUR_STAIRS,
-                Material.STEP
+                Material.STEP,
+                Material.SOUL_SAND,
+                Material.GRASS_PATH,
+                Material.SOIL
         );
         
         if (materialList.stream().anyMatch((m) -> (m.equals(blockMaterial)))) {
