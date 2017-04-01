@@ -368,18 +368,18 @@ public class PlayerData
 
     public boolean hasCooldown(Cooldown cd)
     {
-        long wait_time;// = getCooldown(cd);
+        long wait_time = getCooldown(cd);
 
         switch (cd)
         {
             case USAGE:
-                wait_time = getUsageCooldown() + (hs.getTPCooldownSec() * 1000);
+                wait_time += (hs.getTPCooldownSec() * 1000);
                 break;
             case INVITE:
-                wait_time = getInviteCooldown() + (hs.getSetLocationInviteCooldownSec() * 1000);
+                wait_time += (hs.getSetLocationInviteCooldownSec() * 1000);
                 break;
             case ACCEPTED:
-                wait_time = getInviteAcceptCooldown() + (hs.getLocationInviteAcceptCooldownSec() * 1000);
+                wait_time += (hs.getLocationInviteAcceptCooldownSec() * 1000);
                 break;
             default: //TODO Extend with other cooldowns;
                 return false;
