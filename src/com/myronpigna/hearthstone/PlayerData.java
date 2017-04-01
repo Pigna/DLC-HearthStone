@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -335,8 +334,7 @@ public class PlayerData
         Material blockMaterial = block.getType();
         //Solid block
         if (!blockMaterial.isSolid() && !CheckBlockType(block, (Material.FIRE))) return true;
-        List<Material> materialList = Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
-
+        List<Material> materialList = hs.getMaterialList();
         return materialList.stream().anyMatch((m) -> (m.equals(blockMaterial)));
     }
 
