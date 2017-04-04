@@ -9,6 +9,7 @@ import com.myronpigna.hearthstone.HearthStone;
 import com.myronpigna.hearthstone.Invite;
 import com.myronpigna.hearthstone.PlayerData;
 import com.myronpigna.hearthstone.PlayerData.Cooldown;
+import java.util.ArrayList;
 import net.minecraft.server.v1_11_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_11_R1.PacketPlayOutChat;
 import org.bukkit.OfflinePlayer;
@@ -18,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author myron
@@ -459,7 +461,26 @@ public class HearthStoneCmd implements CommandExecutor
 
     private boolean checkOverride(String[] args)
     {
-
         return Arrays.stream(args).anyMatch(arg -> arg.contains("!"));
+    }
+    /**
+     * AutoComplete commands when tab is pressed
+     * @param sender
+     * @param cmd
+     * @param commandLabel
+     * @param args
+     * @return 
+     */
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args)
+    {
+        if(cmd.getName().equalsIgnoreCase("hs") || cmd.getName().equalsIgnoreCase("hearthstone"))
+        {
+            ArrayList<String> autoComplete = new ArrayList<String>();
+            if(args.length == 1)
+            {
+                
+            }
+        }
+        return null;
     }
 }
