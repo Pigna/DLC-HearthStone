@@ -475,11 +475,33 @@ public class HearthStoneCmd implements CommandExecutor
     {
         if(cmd.getName().equalsIgnoreCase("hs") || cmd.getName().equalsIgnoreCase("hearthstone"))
         {
-            ArrayList<String> autoComplete = new ArrayList<String>();
+            ArrayList<String> autoComplete = new ArrayList<>();
             if(args.length == 1)
             {
-                
+                ArrayList<String> mainCommands = new ArrayList<>();
+                autoComplete.add("set");
+                autoComplete.add("delete");
+                autoComplete.add("accept");
+                autoComplete.add("decline");
+                autoComplete.add("invite");
+                autoComplete.add("help");
+                autoComplete.add("info");
+                if(args[0].equals(""))
+                {
+                    return mainCommands;
+                }
+                else
+                {
+                    for(String s : mainCommands)
+                    {
+                        if(s.toLowerCase().startsWith(args[0].toLowerCase()))
+                        {
+                            autoComplete.add(s);
+                        }
+                    }
+                }
             }
+            return autoComplete;
         }
         return null;
     }
