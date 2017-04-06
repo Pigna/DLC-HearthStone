@@ -8,6 +8,7 @@ package com.myronpigna.hearthstone;
 import com.myronpigna.hearthstone.commands.HearthStoneCmd;
 import com.myronpigna.hearthstone.events.PlayerJoin;
 import com.myronpigna.hearthstone.events.PlayerQuit;
+import com.myronpigna.hearthstone.tabcomplete.HearthStoneTabComplete;
 
 import java.io.File;
 import java.util.*;
@@ -156,6 +157,7 @@ public class HearthStone extends JavaPlugin
     private void registerCommands()
     {
         getCommand("hearthstone").setExecutor(new HearthStoneCmd(this));
+        getCommand("hearthstone").setTabCompleter(new HearthStoneTabComplete(this));
     }
 
     private void registerEvents()

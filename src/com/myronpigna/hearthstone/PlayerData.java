@@ -66,7 +66,31 @@ public class PlayerData
     {
         return locations;
     }
-
+    /**
+     * Gets homes that starts with arg
+     * @param arg
+     * @return List of home names that start with arg
+     */
+    public ArrayList<String> getHomeList(String arg)
+    {
+        ArrayList<String> returnList = new ArrayList<>();
+        if(arg.equals(""))
+        {
+            for(String s : locations.keySet())
+            {
+                returnList.add(s);
+            }
+            return returnList;
+        }
+        for(String s : locations.keySet())
+        {
+            if(s.toLowerCase().startsWith(arg.toLowerCase()))
+            {
+                returnList.add(s);
+            }
+        }
+        return returnList;
+    }
     //World world, float x, float y, float z, double yaw, double pitch
     public boolean setHome(String name)
     {
