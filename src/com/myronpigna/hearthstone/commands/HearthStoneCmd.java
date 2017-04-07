@@ -362,12 +362,8 @@ public class HearthStoneCmd implements CommandExecutor
                     //Set new Hearthstone
                     setNewHeartStone(sender, args, pd);
                     break;
-                case "delete":
-                    //Deletes current hearthstone
-                    deleteHearthStone(args, pd);
-                    break;
-                case "del":
-                    //Alias for delete
+                case "delete"://Deletes current hearthstone
+                case "del":  //Alias for delete //je kan cases "laten doorvallen" als ze het zelfde moeten doen
                     deleteHearthStone(args, pd);
                     break;
                 case "accept":
@@ -378,6 +374,7 @@ public class HearthStoneCmd implements CommandExecutor
                     declineHeartStone(player, pd);
                     break;
                 case "help":
+                case "h":
                     //View info about hearthstone
                     pd.sendMessage("- /hs - To see your current HearthStone(hs) locations");
                     pd.sendMessage("- /hs set [name] - To set a HearthStone location with a name");

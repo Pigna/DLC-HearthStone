@@ -16,14 +16,14 @@ public class Invite implements Comparable<Invite>
 {
 
     private PlayerData sender;
-    private PlayerData reciever;
+    private PlayerData receiver;
     private Location location;
     private String locationName;
 
-    public Invite(PlayerData sender, PlayerData reciever, Location location, String locationName)
+    public Invite(PlayerData sender, PlayerData receiver, Location location, String locationName)
     {
         this.sender = sender;
-        this.reciever = reciever;
+        this.receiver = receiver;
         this.location = location;
         this.locationName = locationName;
     }
@@ -33,9 +33,9 @@ public class Invite implements Comparable<Invite>
         return sender.getPlayer();
     }
 
-    public Player getReciever()
+    public Player getReceiver()
     {
-        return reciever.getPlayer();
+        return receiver.getPlayer();
     }
 
     public Location getLocation()
@@ -50,29 +50,29 @@ public class Invite implements Comparable<Invite>
 
     public void InviteExpired()
     {
-        reciever.sendMessage(getSender().getName() + "'s invite to " + locationName + " has expired.");
-        sender.sendMessage("Your invite to " + getReciever().getName() + " has expired.");
+        receiver.sendMessage(getSender().getName() + "'s invite to " + locationName + " has expired.");
+        sender.sendMessage("Your invite to " + getReceiver().getName() + " has expired.");
     }
 
     public void InviteAccepted(boolean override)
     {
-        reciever.sendMessage("You have accepted the HearthStone invite from " + getSender().getName() + ".");
-        sender.sendMessage(getReciever().getName() + " has accepted your HearthStone invite.");
-        reciever.teleportPlayerLocation(locationName, location, Cooldown.ACCEPTED, override);
+        receiver.sendMessage("You have accepted the HearthStone invite from " + getSender().getName() + ".");
+        sender.sendMessage(getReceiver().getName() + " has accepted your HearthStone invite.");
+        receiver.teleportPlayerLocation(locationName, location, Cooldown.ACCEPTED, override);
         sender.SetCooldown(Cooldown.INVITE);
     }
 
     public void InviteDeclined()
     {
-        reciever.sendMessage("You have declined the HearthStone invite from " + getSender().getName() + ".");
-        sender.sendMessage(getReciever().getName() + " has declined your HearthStone invite.");
+        receiver.sendMessage("You have declined the HearthStone invite from " + getSender().getName() + ".");
+        sender.sendMessage(getReceiver().getName() + " has declined your HearthStone invite.");
     }
 
     @Override
     public int compareTo(Invite o)
     {
         if (!getSender().getName().equals(o.getSender().getName())) return -1;
-        if (!getReciever().getName().equals(o.getReciever().getName())) return -1;
+        if (!getReceiver().getName().equals(o.getReceiver().getName())) return -1;
         if (getLocation().equals(o.getLocation())) return -1;
         if (!getLocationName().equals(o.getLocationName())) return -1;
         return 1;

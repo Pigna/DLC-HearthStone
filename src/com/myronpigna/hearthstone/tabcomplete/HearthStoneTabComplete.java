@@ -7,35 +7,40 @@ package com.myronpigna.hearthstone.tabcomplete;
 
 import com.myronpigna.hearthstone.HearthStone;
 import com.myronpigna.hearthstone.PlayerData;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author myron
  */
-public class HearthStoneTabComplete implements TabCompleter{
+public class HearthStoneTabComplete implements TabCompleter
+{
     private HearthStone hs;
+
     public HearthStoneTabComplete(HearthStone hs)
     {
         this.hs = hs;
     }
+
     /**
      * AutoComplete commands when tab is pressed
+     *
      * @param sender
      * @param cmd
      * @param commandLabel
      * @param args
-     * @return 
+     * @return
      */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args)
     {
-        if(cmd.getName().equalsIgnoreCase("hs") || cmd.getName().equalsIgnoreCase("hearthstone"))
+        if (cmd.getName().equalsIgnoreCase("hs") || cmd.getName().equalsIgnoreCase("hearthstone"))
         {
             if (!(sender instanceof Player))
             {
@@ -46,22 +51,24 @@ public class HearthStoneTabComplete implements TabCompleter{
             Player player = (Player) sender;
             PlayerData pd = hs.getPlayerData(player);
             ArrayList<String> autoComplete = new ArrayList<>();
-            if(args.length == 1)
+            if (args.length == 1)
             {
                 //Addes homes that starts with arg
                 autoComplete.addAll(pd.getHomeList(args[0]));
                 autoComplete.addAll(DefaultCommands(args[0]));
             }
-            if(args.length == 2)
+            if (args.length == 2)
             {
-                
+
             }
             return autoComplete;
         }
         return null;
     }
+
     /**
      * Returns main commands list
+     *
      * @param arg String commands starts with. Give empty string for full list
      * @return List of commands starting with arg
      */
@@ -76,14 +83,14 @@ public class HearthStoneTabComplete implements TabCompleter{
         mainCommands.add("invite");
         mainCommands.add("help");
         mainCommands.add("info");
-        
+
         //if args -> get commands that start with args.
-        if(!arg.equals(""))
+        if (!arg.isEmpty())
         {
             ArrayList<String> returnList = new ArrayList<>();
-            for(String s : mainCommands)
+            for (String s : mainCommands)
             {
-                if(s.toLowerCase().startsWith(arg.toLowerCase()))
+                if (s.toLowerCase().startsWith(arg.toLowerCase()))
                 {
                     returnList.add(s);
                 }
@@ -91,9 +98,7 @@ public class HearthStoneTabComplete implements TabCompleter{
             return returnList;
         }
         //If no args return full list of commands + homes
-        else
-        {
-            return mainCommands;
-        }
+
+        return mainCommands;
     }
 }
