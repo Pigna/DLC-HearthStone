@@ -44,7 +44,7 @@ public class HearthStoneTabComplete implements TabCompleter
         {
             if (!(sender instanceof Player))
             {
-                sender.sendMessage("TabCompelte is not for console.");
+                sender.sendMessage("TabComplete is not for console.");
                 return null;
             }
 
@@ -59,7 +59,21 @@ public class HearthStoneTabComplete implements TabCompleter
             }
             if (args.length == 2)
             {
-
+                switch (args[0].toLowerCase())
+                {
+                    case "delete":
+                    case "del":
+                        //return list of current homes
+                        autoComplete.addAll(pd.getHomeList(args[1]));
+                        break;
+                    case "invite":
+                    case "inv":
+                        //return list of current online players names
+                        hs.getOnlinePlayerNames(args[1]);
+                        break;
+                    default:
+                        break;
+                }
             }
             return autoComplete;
         }

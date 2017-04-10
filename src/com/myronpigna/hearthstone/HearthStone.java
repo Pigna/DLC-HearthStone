@@ -302,4 +302,30 @@ public class HearthStone extends JavaPlugin
         }
         return null;
     }
+    /**
+     * Gets a list of all online players starting with arg
+     * @param arg beginning of a name or leave empty
+     * @return ArrayList<String> containing names of all online players starting with arg
+     */
+    public ArrayList<String> getOnlinePlayerNames(String arg)
+    {
+        ArrayList<String> playerNames = new ArrayList<>();
+        if(!arg.isEmpty())
+        {
+            for(Player p : getServer().getOnlinePlayers())
+            {
+                if(p.getName().startsWith(arg))
+                {
+                    playerNames.add(p.getName());
+                }
+            }
+            return playerNames;
+        }
+        for(Player p : getServer().getOnlinePlayers())
+        {
+            playerNames.add(p.getName());
+        }
+        return playerNames;
+    }
+    
 }

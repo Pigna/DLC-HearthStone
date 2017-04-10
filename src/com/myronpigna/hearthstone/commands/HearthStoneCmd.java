@@ -385,21 +385,25 @@ public class HearthStoneCmd implements CommandExecutor
                     pd.sendMessage("- /hs info - Information about the creator of the HearthStone plugin");
                     break;
                 case "invite":
+                case "inv":
                     inviteHeartStone(sender, args, player, pd);
                     break;
                 case "request":
+                case "req":
                     //TODO: Send request to player to go to his home
                     //pd.sendMessage("Request Syntax : /hs request [Player name]");
                     pd.sendMessage("Not in use.");
                     break;
                 case "info":
-                    pd.sendMessage("this plugin [HearthStone] is created by Myron Antonissen for the DayLightCraft server.");
+                    pd.sendMessage("This plugin [HearthStone] is created by Myron Antonissen for the DayLightCraft server.");
+                    pd.sendMessage("HearthStone is a 'home' plugin to save locations and to be able to return to them, while also being able to invite other players to the location.");
                     break;
                 case "reset":
                     //Resets the cooldowns of a player
                     resetHeartStone(sender, args, pd);
                     break;
                 case "locate":
+                    //Get the location of a set HS of a player
                     locateHeartStone(args, player, pd);
                     break;
                 default:
