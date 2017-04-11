@@ -57,7 +57,7 @@ public class HearthStoneTabComplete implements TabCompleter
                 autoComplete.addAll(pd.getHomeList(args[0]));
                 autoComplete.addAll(DefaultCommands(args[0]));
             }
-            if (args.length == 2)
+            if (args.length >= 2)
             {
                 switch (args[0].toLowerCase())
                 {
@@ -68,8 +68,16 @@ public class HearthStoneTabComplete implements TabCompleter
                         break;
                     case "invite":
                     case "inv":
-                        //return list of current online players names
-                        hs.getOnlinePlayerNames(args[1]);
+                        if(args.length == 2)
+                        {
+                            //return list of current online players names
+                            autoComplete.addAll(hs.getOnlinePlayerNames(args[1]));
+                        }
+                        else if(args.length == 3)
+                        {
+                            //return list of current homes
+                            autoComplete.addAll(pd.getHomeList(args[2]));
+                        }
                         break;
                     default:
                         break;

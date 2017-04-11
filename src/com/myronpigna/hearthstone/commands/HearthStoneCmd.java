@@ -254,47 +254,11 @@ public class HearthStoneCmd implements CommandExecutor
                     Player targetPlayer = hs.getServer().getPlayer(input[0]);
                     if (targetPlayer != null)
                     {
-                        PlayerData targetPlayerData = hs.getPlayerData(targetPlayer);
-                        if (input.length == 1)
-                        {
-                            OtherPlayerHomes(targetPlayerData, pd, input[0]);
-                        }
-                        else if (!targetPlayerData.hasHome(input[1]))
-                        {
-                            pd.sendMessage("Targeted player does not have a home with that name.");
-                        }
-                        else
-                        {
-                            pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
-                        }
+                        OtherPlayerData(pd, input, targetPlayer, override);
                     }
                     else
                     {
-                        OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(input[0]));
-                        if (targetOfflinePlayer == null)
-                        {
-                            pd.sendMessage("No player with that name exists.");
-                        }
-                        else if (!targetOfflinePlayer.hasPlayedBefore())
-                        {
-                            pd.sendMessage("That player has never played on this server before.");
-                        }
-                        else
-                        {
-                            PlayerData targetPlayerData = new PlayerData(targetOfflinePlayer, hs);
-                            if (input.length == 1)
-                            {
-                                OtherPlayerHomes(targetPlayerData, pd, input[0]);
-                            }
-                            else if (!targetPlayerData.hasHome(input[1]))
-                            {
-                                pd.sendMessage("Targeted player does not have a location with that name.");
-                            }
-                            else
-                            {
-                                pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
-                            }
-                        }
+                        OtherOfflinePlayerData(pd, args, override);
                     }
                 }
                 else
@@ -325,6 +289,59 @@ public class HearthStoneCmd implements CommandExecutor
         }
     }
 
+    private void OtherPlayerData (PlayerData pd, String[] input, Player targetPlayer, Boolean override)
+    {
+        PlayerData targetPlayerData = hs.getPlayerData(targetPlayer);
+        if (input.length == 1)
+        {
+            OtherPlayerHomes(targetPlayerData, pd, input[0]);
+        }
+        else if (!targetPlayerData.hasHome(input[1]))
+        {
+            pd.sendMessage("Targeted player does not have a home with that name.");
+        }
+        else
+        {
+            pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
+        }
+    }
+    
+    private void OtherOfflinePlayerData (PlayerData pd, String[] input, Boolean override)
+    {
+        try
+        {
+            OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(input[0]));
+            if (targetOfflinePlayer == null)
+            {
+                pd.sendMessage("No player with that name exists.");
+            }
+            else if (!targetOfflinePlayer.hasPlayedBefore())
+            {
+                pd.sendMessage("That player has never played on this server before.");
+            }
+            else
+            {
+                PlayerData targetPlayerData = new PlayerData(targetOfflinePlayer, hs);
+                if (input.length == 1)
+                {
+                    OtherPlayerHomes(targetPlayerData, pd, input[0]);
+                }
+                else if (!targetPlayerData.hasHome(input[1]))
+                {
+                    pd.sendMessage("Targeted player does not have a location with that name.");
+                }
+                else
+                {
+                    pd.teleportPlayerLocation(input[1], targetPlayerData.getHomeLocation(input[1]), Cooldown.OTHER, override);
+                }
+            }
+        }
+        catch(NullPointerException ex)
+        {
+            pd.sendMessage("Fout bij het ophalen van de speler data. Is de naam correct?");
+        }
+    }
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
     {

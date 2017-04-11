@@ -314,7 +314,7 @@ public class HearthStone extends JavaPlugin
         {
             for(Player p : getServer().getOnlinePlayers())
             {
-                if(p.getName().startsWith(arg))
+                if(p.getName().toLowerCase().startsWith(arg.toLowerCase()))
                 {
                     playerNames.add(p.getName());
                 }
