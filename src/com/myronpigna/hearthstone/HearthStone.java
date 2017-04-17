@@ -129,6 +129,23 @@ public class HearthStone extends JavaPlugin
         return getConfig().getInt("location-invite-accept-cooldown", 600);
     }
 
+    public int getCooldownSec(Cooldown cooldown)
+    {
+        switch(cooldown)
+        {
+            case USAGE:
+                return getTPCooldownSec();
+            case INVITE:
+                return getLocationInviteCooldownSec();
+            case ACCEPTED:
+                return getLocationInviteAcceptCooldownSec();
+            case SET:
+                return getSetLocationInviteCooldownSec();
+            default:
+                return getTPCooldownSec();
+        }
+    }
+    
     public int getRankLocationAmount(String rank)
     {
         if (rankLocationAmount.containsKey(rank)) return rankLocationAmount.get(rank);
@@ -199,9 +216,9 @@ public class HearthStone extends JavaPlugin
         return null;
     }
 
-    public String getTimeRemaining(Long time)
+    public String getTimeRemaining(Long time, Cooldown cooldownType)
     {
-        long maxWait = getTPCooldownSec() * 1000;
+        long maxWait = getCooldownSec(cooldownType) * 1000;
         long diff = maxWait - (System.currentTimeMillis() - time);
         long seconds = diff / 1000 % 60;
         long minutes = diff / (60 * 1000) % 60;

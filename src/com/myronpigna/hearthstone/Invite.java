@@ -5,7 +5,6 @@
  */
 package com.myronpigna.hearthstone;
 
-import com.myronpigna.hearthstone.PlayerData.Cooldown;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -14,7 +13,6 @@ import org.bukkit.entity.Player;
  */
 public class Invite implements Comparable<Invite>
 {
-
     private PlayerData sender;
     private PlayerData receiver;
     private Location location;

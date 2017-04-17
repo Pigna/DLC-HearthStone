@@ -267,7 +267,7 @@ public class PlayerData
         Long cooldown = getCooldown(cd);
         if (hasCooldown(cd) && !player.hasPermission("hearthstone.bypass.cooldown"))
         {
-            sendMessage("Your HearthStone is still in cooldown for " + hs.getTimeRemaining(cooldown) + ".");
+            sendMessage("Your HearthStone is still in cooldown for " + hs.getTimeRemaining(cooldown, Cooldown.USAGE) + ".");
             return;
         }
 
@@ -496,14 +496,5 @@ public class PlayerData
     private long getUsageCooldown()
     {
         return playerDataConfig.getLong("usageCooldown", 0);
-    }
-
-    public enum Cooldown
-    {
-        USAGE,
-        INVITE,
-        ACCEPTED,
-        SET,
-        OTHER
     }
 }

@@ -5,10 +5,10 @@
  */
 package com.myronpigna.hearthstone.commands;
 
+import com.myronpigna.hearthstone.Cooldown;
 import com.myronpigna.hearthstone.HearthStone;
 import com.myronpigna.hearthstone.Invite;
 import com.myronpigna.hearthstone.PlayerData;
-import com.myronpigna.hearthstone.PlayerData.Cooldown;
 import java.util.ArrayList;
 import net.minecraft.server.v1_11_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_11_R1.PacketPlayOutChat;
@@ -73,7 +73,7 @@ public class HearthStoneCmd implements CommandExecutor
             }
             else
             {
-                pd.sendMessage("You have a invite teleport cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.ACCEPTED)));
+                pd.sendMessage("You have a invite teleport cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.ACCEPTED), Cooldown.ACCEPTED));
             }
         }
         else pd.sendMessage("You have no HearthStone invites active.");
@@ -124,7 +124,7 @@ public class HearthStoneCmd implements CommandExecutor
                     else
                     {
                         //error
-                        pd.sendMessage("You have a invite cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.INVITE)));
+                        pd.sendMessage("You have a invite cooldown active for " + hs.getTimeRemaining(pd.getCooldown(Cooldown.INVITE), Cooldown.INVITE));
                     }
                 }
                 else
