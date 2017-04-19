@@ -9,7 +9,6 @@ import com.myronpigna.hearthstone.Cooldown;
 import com.myronpigna.hearthstone.HearthStone;
 import com.myronpigna.hearthstone.Invite;
 import com.myronpigna.hearthstone.PlayerData;
-import java.util.ArrayList;
 import net.minecraft.server.v1_11_R1.IChatBaseComponent.ChatSerializer;
 import net.minecraft.server.v1_11_R1.PacketPlayOutChat;
 import org.bukkit.OfflinePlayer;
@@ -19,7 +18,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author myron
@@ -241,7 +239,7 @@ public class HearthStoneCmd implements CommandExecutor
         }
     }
 
-    private void defaultHeartStone(String[] args, Player player, PlayerData pd) //TODO hak dit op in kleinere methodes
+    private void defaultHeartStone(String[] args, Player player, PlayerData pd)
     {
         boolean override = checkOverride(args);
         if (args.length == 1 || (args.length == 2 && override))
