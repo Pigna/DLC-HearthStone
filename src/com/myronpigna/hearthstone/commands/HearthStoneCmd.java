@@ -34,8 +34,9 @@ public class HearthStoneCmd implements CommandExecutor
     private void setNewHeartStone(CommandSender sender, String[] args, PlayerData pd)
     {
         if (!sender.hasPermission("hearthstone.set")) NoPermission(pd);
-        else if (args.length == 2) if (pd.setHome(args[1])) pd.sendMessage("HearthStone " + args[1] + " is set.");
-        else pd.sendMessage("You have reached your maximum amount of locations.");
+        else if (args.length == 2)
+            if (pd.setHome(args[1])) pd.sendMessage("HearthStone " + args[1] + " is set.");
+            else pd.sendMessage("You have reached your maximum amount of locations.");
         else pd.sendMessage("Set Syntax : /hs set [name]");
     }
 
@@ -244,11 +245,12 @@ public class HearthStoneCmd implements CommandExecutor
         boolean override = checkOverride(args);
         if (args.length == 1 || (args.length == 2 && override))
         {
-            if (args[0].indexOf(":") > 0)//check position off.
+            String homeName = args[0].toLowerCase();
+            if (homeName.indexOf(":") > 0)//check position off.
             {
                 if (player.hasPermission("hearthstone.use.other"))
                 {
-                    String[] input = args[0].split(":");
+                    String[] input = homeName.split(":");
                     Player targetPlayer = hs.getServer().getPlayer(input[0]);
                     if (targetPlayer != null)
                     {
@@ -264,9 +266,9 @@ public class HearthStoneCmd implements CommandExecutor
                     NoPermission(pd);
                 }
             }
-            else if (pd.hasHome(args[0]))
+            else if (pd.hasHome(homeName))
             {
-                pd.teleportPlayerLocation(args[0], pd.getHomeLocation(args[0]), Cooldown.USAGE, override);
+                pd.teleportPlayerLocation(homeName, pd.getHomeLocation(homeName), Cooldown.USAGE, override);
             }
             else // error
             {

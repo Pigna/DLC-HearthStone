@@ -94,14 +94,14 @@ public class PlayerData
     //World world, float x, float y, float z, double yaw, double pitch
     public boolean setHome(String name)
     {
+        String safename = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
         if (hasHome() >= hs.getRankLocationAmount(player) && !player.hasPermission("hearthstone.bypass.homes"))
         {
-            return false;
+            if (!hasHome(safename))
+                return false;
         }
-
-        String safename = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        
         Location location = player.getLocation();
-        //Check if home already exists
         locations.put(safename, location);
         ArrayList<String> values = new ArrayList<String>();
         values.add(location.getWorld().getName());
