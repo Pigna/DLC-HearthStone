@@ -18,6 +18,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author myron
@@ -258,7 +261,7 @@ public class HearthStoneCmd implements CommandExecutor
                     }
                     else
                     {
-                        OtherOfflinePlayerData(pd, args, override);
+                        OtherOfflinePlayerData(pd, input, override);
                     }
                 }
                 else
@@ -310,7 +313,13 @@ public class HearthStoneCmd implements CommandExecutor
     {
         try
         {
-            OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(input[0]));
+            UUID uuid = hs.getUUIDfromPlayerListFile(input[0]);
+            if (uuid == null)
+            {
+                pd.sendMessage("UUID not found in uuidfile.");
+                return;
+            }
+            OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(uuid);
             if (targetOfflinePlayer == null)
             {
                 pd.sendMessage("No player with that name exists.");
@@ -336,9 +345,10 @@ public class HearthStoneCmd implements CommandExecutor
                 }
             }
         }
-        catch(NullPointerException ex)
+        catch(Exception ex)
         {
             pd.sendMessage("Fout bij het ophalen van de speler data. Is de naam correct?");
+            Logger.getAnonymousLogger().log(Level.SEVERE, "Fout bij ophalen UUID offline player. {0}", ex.getMessage());
         }
     }
     

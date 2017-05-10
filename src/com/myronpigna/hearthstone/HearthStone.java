@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -254,6 +255,12 @@ public class HearthStone extends JavaPlugin
         return false;
     }
 
+    /**
+     * Add a invite to the currentInvite list
+     * @param pTarget Player that receives the invite
+     * @param sender Player that send the invite
+     * @param locationName Location the receiver is invited to
+     */
     public void addInvite(PlayerData pTarget, PlayerData sender, String locationName)
     {
         Invite newInvite = new Invite(sender, pTarget, sender.getHomeLocation(locationName), locationName);
@@ -274,6 +281,9 @@ public class HearthStone extends JavaPlugin
         if (currentInvites.containsKey(pname)) currentInvites.remove(pname);
     }
 
+    /**
+     * Creation of the PlayerListFile
+     */
     private void createPlayerListFile()
     {
         this.playerListFile = new File(getDataFolder(), "PlayerUsernameUUID.yml");
@@ -291,6 +301,10 @@ public class HearthStone extends JavaPlugin
         playerListConfig = YamlConfiguration.loadConfiguration(playerListFile);
     }
 
+    /**
+     * Add Player to the playerListFile to be able to get the UUID when he is offline
+     * @param player Player to add to the file
+     */
     public void addtoPlayerListFile(Player player)
     {
         playerListConfig.set("players." + player.getName(), player.getUniqueId().toString());
@@ -305,15 +319,21 @@ public class HearthStone extends JavaPlugin
         }
     }
 
+    /**
+     * Get the UUID of a playerName from the player/uuid list
+     * @param playerName Name of the player
+     * @return UUID of given player's name
+     */
     public UUID getUUIDfromPlayerListFile(String playerName)
     {
-        if (playerListConfig.getConfigurationSection("players") != null)
+        ConfigurationSection playerSection = playerListConfig.getConfigurationSection("players");
+        if (playerSection != null)
         {
-            for (String name : playerListConfig.getConfigurationSection("players").getKeys(false))
+            for (String name : playerSection.getKeys(false))
             {
                 if (name.equalsIgnoreCase(playerName))
                 {
-                    return UUID.fromString(playerListConfig.getString("players." + playerName));
+                    return UUID.fromString(playerSection.getString(name));
                 }
             }
         }
