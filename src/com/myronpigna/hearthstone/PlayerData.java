@@ -16,10 +16,12 @@ import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.server.v1_11_R1.IChatBaseComponent;
@@ -115,10 +117,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error saving new home into player file. '" + player.getName() + "' '" + safename + "'");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving new home into player file. '" + player.getName() + "' '" + safename + "'", ex);
             return false;
         }
         //Set cooldown on set.
@@ -170,8 +171,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing home from player file. '" + player.getName() + "' '" + name + "'", ex);
             return false;
         }
         return true;
@@ -187,7 +189,7 @@ public class PlayerData
             }
             catch (Exception ex)
             {
-                //
+                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "Exception : Error creating plugin directory", ex);
             }
         }
         if (!dataFile.exists())
@@ -195,10 +197,12 @@ public class PlayerData
             try
             {
                 dataFile.createNewFile();
+                //TODO: check config if new player message is true;
+                sendMessage("This server is using the plugin HearthStone to replace 'homes'. Type /hs help for more information.");
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
-                //
+                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error creating playerfile", ex);
             }
         }
         playerDataConfig = YamlConfiguration.loadConfiguration(dataFile);
@@ -207,10 +211,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error updating player name on load.");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error updating playername onload : " + player.getName(), ex);
         }
     }
 
@@ -238,10 +241,9 @@ public class PlayerData
                         {
                             playerDataConfig.save(dataFile);
                         }
-                        catch (Exception ex)
+                        catch (IOException ex)
                         {
-                            Logger logger = hs.getLogger();
-                            logger.info("Error removing location from non-existing world from saved hearthstones.");
+                            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing location from non-existing world from saved hearthstones", ex);
                         }
                     }
                 }
@@ -434,10 +436,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error resetting Invite Cooldown to file");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error Saving the reset cooldowns to file", ex);
         }
     }
 
@@ -448,10 +449,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error saving Invite Cooldown to file");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving the invite cooldown to file", ex);
         }
     }
 
@@ -467,10 +467,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error saving Invite Accept Cooldown to file");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving the invite cooldown to file", ex);
         }
     }
 
@@ -486,10 +485,9 @@ public class PlayerData
         {
             playerDataConfig.save(dataFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = hs.getLogger();
-            logger.info("Error saving usage cooldown to file");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving the use cooldown to file", ex);
         }
     }
 

@@ -11,7 +11,9 @@ import com.myronpigna.hearthstone.events.PlayerQuit;
 import com.myronpigna.hearthstone.tabcomplete.HearthStoneTabComplete;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
@@ -289,14 +291,16 @@ public class HearthStone extends JavaPlugin
         this.playerListFile = new File(getDataFolder(), "PlayerUsernameUUID.yml");
         if (!playerListFile.exists())
         {
+
             try
             {
                 playerListFile.createNewFile();
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
-                //
+                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error creating PlayerListFile", ex);
             }
+
         }
         playerListConfig = YamlConfiguration.loadConfiguration(playerListFile);
     }
@@ -312,10 +316,9 @@ public class HearthStone extends JavaPlugin
         {
             playerListConfig.save(playerListFile);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Logger logger = getLogger();
-            logger.info("Error saving new player into playerListFile.");
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error adding Player to PlayerListFile", ex);
         }
     }
 

@@ -316,7 +316,7 @@ public class HearthStoneCmd implements CommandExecutor
             UUID uuid = hs.getUUIDfromPlayerListFile(input[0]);
             if (uuid == null)
             {
-                pd.sendMessage("UUID not found in uuidfile.");
+                pd.sendMessage("Player name does not match any known playernames.");
                 return;
             }
             OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(uuid);
@@ -345,10 +345,10 @@ public class HearthStoneCmd implements CommandExecutor
                 }
             }
         }
-        catch(Exception ex)
+        catch(IllegalArgumentException ex)
         {
-            pd.sendMessage("Fout bij het ophalen van de speler data. Is de naam correct?");
-            Logger.getAnonymousLogger().log(Level.SEVERE, "Fout bij ophalen UUID offline player. {0}", ex.getMessage());
+            pd.sendMessage("Error getting player data. Is the name correct?");
+            Logger.getAnonymousLogger().log(Level.SEVERE, "IllegalArgumentException : Error getting UUID of a offline player", ex);
         }
     }
     
@@ -390,7 +390,7 @@ public class HearthStoneCmd implements CommandExecutor
                     setNewHeartStone(sender, args, pd);
                     break;
                 case "delete"://Deletes current hearthstone
-                case "del":  //Alias for delete //je kan cases "laten doorvallen" als ze het zelfde moeten doen
+                case "del":  //Alias for delete
                     deleteHearthStone(args, pd);
                     break;
                 case "accept":
@@ -409,7 +409,7 @@ public class HearthStoneCmd implements CommandExecutor
                     pd.sendMessage("- /hs invite [player] [name] - To invite a player to your HS location by player name and HS name");
                     pd.sendMessage("- /hs accept - To accept a HearthStone invite");
                     pd.sendMessage("- /hs decline - To decline a HearthStone invite");
-                    pd.sendMessage("- /hs info - Information about the creator of the HearthStone plugin");
+                    pd.sendMessage("- /hs info - Information about the creator of the HearthStone plugin and its features");
                     break;
                 case "invite":
                 case "inv":
