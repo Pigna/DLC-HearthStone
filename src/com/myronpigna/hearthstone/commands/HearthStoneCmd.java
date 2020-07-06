@@ -9,8 +9,8 @@ import com.myronpigna.hearthstone.Cooldown;
 import com.myronpigna.hearthstone.HearthStone;
 import com.myronpigna.hearthstone.Invite;
 import com.myronpigna.hearthstone.PlayerData;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_13_R2.IChatBaseComponent;
+import net.minecraft.server.v1_13_R2.PacketPlayOutChat;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -445,7 +445,7 @@ public class HearthStoneCmd implements CommandExecutor
     {
         PlayerData targetpd = hs.getPlayerData(pTarget);
 
-        PacketPlayOutChat packet = new PacketPlayOutChat(ChatSerializer.a("[\"\",{\"text\":\"[Accept]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Accept HearthStone invite.\",\"color\":\"green\"}]}}},{\"text\":\" or \",\"color\":\"none\",\"bold\":false},{\"text\":\"[Decline]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs decline\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Decline HearthStone invite.\",\"color\":\"red\"}]}}}]"));
+        PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a("[\"\",{\"text\":\"[Accept]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Accept HearthStone invite.\",\"color\":\"green\"}]}}},{\"text\":\" or \",\"color\":\"none\",\"bold\":false},{\"text\":\"[Decline]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs decline\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Decline HearthStone invite.\",\"color\":\"red\"}]}}}]"));
         targetpd.sendMessage(player.getName() + " invited you to his HearthStone '" + name + "' will expire in " + hs.getInviteTimeoutSec() + " sec. click a option below:");
         targetpd.sendChatPacket(packet);
         hs.addInvite(targetpd, pd, name);
@@ -459,7 +459,7 @@ public class HearthStoneCmd implements CommandExecutor
         {
             ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + playername + ":" + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + " from " + playername + ".\"}]}}}";
         }
-        PacketPlayOutChat packet = new PacketPlayOutChat(ChatSerializer.a("[" + ClickableHearthStoneList + "]"));
+        PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a("[" + ClickableHearthStoneList + "]"));
         pd.sendMessage(playername + "'s current HearthStone's are:");
         pd.sendChatPacket(packet);
     }
@@ -472,7 +472,7 @@ public class HearthStoneCmd implements CommandExecutor
         {
             ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + ".\"}]}}}";
         }
-        PacketPlayOutChat packet = new PacketPlayOutChat(ChatSerializer.a("[" + ClickableHearthStoneList + "]"));
+        PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a("[" + ClickableHearthStoneList + "]"));
         pd.sendMessage("Your current HearthStone's are:");
         pd.sendChatPacket(packet);
     }
