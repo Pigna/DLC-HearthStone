@@ -26,7 +26,6 @@ permissions:
             hearthstone.use: true
             hearthstone.use.other: true
             hearthstone.locate: true
-            hearthstone.use: true
     hearthstone.use:
         description: Allow to teleport to HearthStone locations
         default: op
