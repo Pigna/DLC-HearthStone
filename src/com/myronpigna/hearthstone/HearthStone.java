@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,7 +37,13 @@ public class HearthStone extends JavaPlugin
     private HashMap<String, Integer> rankLocationAmount = new HashMap<>();
     private File playerListFile;
     private YamlConfiguration playerListConfig;
-    private List<Material> materialList = Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
+    private List<Material> materialList;// Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
+
+    public HearthStone() {
+//        Stream.Of()
+
+        //materialList = Stream.of(Material.values()).filter(Material::isSolid).collect(Collectors.toList());
+    }
 
     @Override
     public void onEnable()
@@ -50,6 +58,7 @@ public class HearthStone extends JavaPlugin
             playerList.add(new PlayerData(player, this));
         }
         createPlayerListFile();
+        materialList = Stream.of(Material.values()).filter(Material::isSolid).collect(Collectors.toList());
         logger.info(pdfFile.getName() + " v." + pdfFile.getVersion() + " has been enabled!");
     }
 
