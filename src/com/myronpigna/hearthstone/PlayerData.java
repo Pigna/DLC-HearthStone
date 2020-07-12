@@ -34,6 +34,7 @@ public class PlayerData
     private YamlConfiguration DataFile;
     private HearthStone hs;
     private File pluginFolder;
+    private File playerDataFolder;
     private File dataFile;
     private YamlConfiguration playerDataConfig;
     private HashMap<String, Location> locations = new HashMap<>();
@@ -44,7 +45,8 @@ public class PlayerData
         this.player = player;
         this.hs = hs;
         this.pluginFolder = hs.getDataFolder();
-        this.dataFile = new File(pluginFolder, player.getUniqueId() + ".yml");
+        this.playerDataFolder = hs.getPlayerDataFolder();
+        this.dataFile = new File(playerDataFolder, player.getUniqueId() + ".yml");
         CreateFile();
         LoadFile();
     }
@@ -53,7 +55,8 @@ public class PlayerData
     {
         this.hs = hs;
         this.pluginFolder = hs.getDataFolder();
-        this.dataFile = new File(pluginFolder, offlinePlayer.getUniqueId() + ".yml");
+        this.playerDataFolder = hs.getPlayerDataFolder();
+        this.dataFile = new File(playerDataFolder, offlinePlayer.getUniqueId() + ".yml");
         LoadFile();
     }
 
@@ -194,6 +197,7 @@ public class PlayerData
         {
             try
             {
+
                 dataFile.createNewFile();
                 //TODO: check config if new player message is true;
                 sendMessage("This server is using the plugin HearthStone to replace 'homes'. Type /hs help for more information.");

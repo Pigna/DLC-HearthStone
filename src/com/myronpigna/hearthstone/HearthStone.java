@@ -36,6 +36,7 @@ public class HearthStone extends JavaPlugin
     private HashMap<String, Invite> currentInvites = new HashMap<>();
     private HashMap<String, Integer> rankLocationAmount = new HashMap<>();
     private File playerListFile;
+    private File playerDataFolder;
     private YamlConfiguration playerListConfig;
     private List<Material> materialList;// Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
 
@@ -376,5 +377,21 @@ public class HearthStone extends JavaPlugin
         }
         return playerNames;
     }
-    
+
+    public File getPlayerDataFolder()
+    {
+        this.playerDataFolder = new File(getDataFolder(), "playerData");
+        if (!playerDataFolder.exists())
+        {
+            try
+            {
+                playerDataFolder.mkdir();
+            }
+            catch (Exception ex)
+            {
+                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "Exception : Error creating player data directory", ex);
+            }
+        }
+        return playerDataFolder;
+    }
 }
