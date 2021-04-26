@@ -110,7 +110,7 @@ public class HearthStoneCmd implements CommandExecutor
         else if (args.length == 2)
         {
             Player targetPlayer = hs.getServer().getPlayer(args[1]);
-            if (targetPlayer != null)
+            if (targetPlayer != null && !targetPlayer.getName().equals(sender.getName()))
             {
                 int amount = pd.hasHome();
                 if (amount > 0)
@@ -147,7 +147,7 @@ public class HearthStoneCmd implements CommandExecutor
             if (amount > 0)
             {
                 Player targetPlayer = hs.getServer().getPlayer(args[1]);
-                if (targetPlayer == null)
+                if (targetPlayer == null || !targetPlayer.getName().equals(sender.getName()))
                 {
                     //error
                     pd.sendMessage("No online player named '" + args[1] + "' could be found.");
