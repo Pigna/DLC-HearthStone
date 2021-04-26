@@ -147,10 +147,15 @@ public class HearthStoneCmd implements CommandExecutor
             if (amount > 0)
             {
                 Player targetPlayer = hs.getServer().getPlayer(args[1]);
-                if (targetPlayer == null || !targetPlayer.getName().equals(sender.getName()))
+                if (targetPlayer == null)
                 {
                     //error
                     pd.sendMessage("No online player named '" + args[1] + "' could be found.");
+                }
+                else if(targetPlayer.getName().equals(sender.getName()))
+                {
+                    //error
+                    pd.sendMessage("You can't send yourself an invite.");
                 }
                 else if (pd.hasHome(args[2]))
                 {
