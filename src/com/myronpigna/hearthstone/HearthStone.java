@@ -240,13 +240,25 @@ public class HearthStone extends JavaPlugin
         return hours > 0 ? hours + " Hours " + minutes + " Min " + seconds + " Sec" : minutes > 0 ? minutes + " Min " + seconds + " Sec" : seconds + " Sec";
     }
 
-    public void addCooldown(PlayerData pd)
+    public void addCooldown(PlayerData pd, Cooldown usage)
     {
-        currentUsageCooldowns.put(pd.getPlayer().getName(), System.currentTimeMillis());
         getServer().getScheduler().scheduleSyncDelayedTask(this, () ->
         {
             deleteCooldown(pd.getPlayer().getName());
-            pd.sendMessage("Your HearthStone is no longer in cooldown.");
+            switch (usage)
+            {
+                case USAGE://Hearthstone usage
+                    pd.sendMessage("Your HearthStone is no longer in cooldown.");
+                    break;
+                case SET://Set hS
+                case INVITE://Invite usage
+                case ACCEPTED://Invite Accept
+                    pd.sendMessage("Your HearthStone invite is no longer in cooldown.");
+                    break;
+                case OTHER://Use other
+                    pd.sendMessage("A cool down of your Hearthstone has expired.");
+                    break;
+            }
         }, getTPCooldownTick());
     }
 

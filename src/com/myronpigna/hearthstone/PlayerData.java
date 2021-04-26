@@ -447,6 +447,7 @@ public class PlayerData
     private void setInviteCooldown()
     {
         playerDataConfig.set("inviteCooldown", System.currentTimeMillis());
+        hs.addCooldown(this, Cooldown.INVITE);
         try
         {
             playerDataConfig.save(dataFile);
@@ -483,6 +484,7 @@ public class PlayerData
     private void setUsageCooldown()
     {
         playerDataConfig.set("usageCooldown", System.currentTimeMillis());
+        hs.addCooldown(this, Cooldown.USAGE);
         try
         {
             playerDataConfig.save(dataFile);
