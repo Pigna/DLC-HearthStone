@@ -13,10 +13,10 @@ import org.bukkit.entity.Player;
  */
 public class Invite implements Comparable<Invite>
 {
-    private PlayerData sender;
-    private PlayerData receiver;
-    private Location location;
-    private String locationName;
+    private final PlayerData sender;
+    private final PlayerData receiver;
+    private final Location location;
+    private final String locationName;
 
     public Invite(PlayerData sender, PlayerData receiver, Location location, String locationName)
     {

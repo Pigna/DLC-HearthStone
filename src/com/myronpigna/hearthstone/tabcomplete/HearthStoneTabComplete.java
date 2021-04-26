@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
  */
 public class HearthStoneTabComplete implements TabCompleter
 {
-    private HearthStone hs;
+    private final HearthStone hs;
 
     public HearthStoneTabComplete(HearthStone hs)
     {

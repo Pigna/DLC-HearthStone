@@ -32,12 +32,12 @@ import org.bukkit.block.Block;
 public class PlayerData
 {
     private YamlConfiguration DataFile;
-    private HearthStone hs;
-    private File pluginFolder;
-    private File playerDataFolder;
-    private File dataFile;
+    private final HearthStone hs;
+    private final File pluginFolder;
+    private final File playerDataFolder;
+    private final File dataFile;
     private YamlConfiguration playerDataConfig;
-    private HashMap<String, Location> locations = new HashMap<>();
+    private final HashMap<String, Location> locations = new HashMap<>();
     private Player player;
 
     public PlayerData(Player player, HearthStone hs)

@@ -32,11 +32,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class HearthStone extends JavaPlugin
 {
     public ArrayList<PlayerData> playerList = new ArrayList<>();
-    private HashMap<String, Long> currentUsageCooldowns = new HashMap<>();
-    private HashMap<String, Invite> currentInvites = new HashMap<>();
-    private HashMap<String, Integer> rankLocationAmount = new HashMap<>();
+    private final HashMap<String, Invite> currentInvites = new HashMap<>();
+    private final HashMap<String, Integer> rankLocationAmount = new HashMap<>();
     private File playerListFile;
-    private File playerDataFolder;
     private YamlConfiguration playerListConfig;
     private List<Material> materialList;// Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
 
@@ -223,12 +221,6 @@ public class HearthStone extends JavaPlugin
         playerList.remove(pd);
     }
 
-    public Long getCooldown(String pname)
-    {
-        if (currentUsageCooldowns.containsKey(pname)) return currentUsageCooldowns.get(pname);
-        return null;
-    }
-
     public String getTimeRemaining(Long time, Cooldown cooldownType)
     {
         long maxWait = getCooldownSec(cooldownType) * 1000;
@@ -264,17 +256,18 @@ public class HearthStone extends JavaPlugin
 
     public void deleteCooldown(String pname)
     {
-        if (currentUsageCooldowns.containsKey(pname)) currentUsageCooldowns.remove(pname);
+        //TODO: On reset cooldowns remove cooldown message scheduler
     }
 
     public Invite getInvite(String pname)
     {
-        return currentInvites.containsKey(pname) ? currentInvites.get(pname) : null;
+        return currentInvites.getOrDefault(pname, null);
     }
 
     public boolean getInviteExists(String pname, Invite invite)
     {
-        if (currentInvites.containsKey(pname)) if (currentInvites.get(pname).equals(invite)) return true;
+        if (currentInvites.containsKey(pname))
+            return currentInvites.get(pname).equals(invite);
 
         return false;
     }
@@ -392,7 +385,7 @@ public class HearthStone extends JavaPlugin
 
     public File getPlayerDataFolder()
     {
-        this.playerDataFolder = new File(getDataFolder(), "playerData");
+        File playerDataFolder = new File(getDataFolder(), "playerData");
         if (!playerDataFolder.exists())
         {
             try
