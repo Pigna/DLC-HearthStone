@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myronpigna.hearthstone.events;
+package nl.daylightcraft.hearthstone.events;
 
-import com.myronpigna.hearthstone.HearthStone;
-import com.myronpigna.hearthstone.PlayerData;
+import nl.daylightcraft.hearthstone.HearthStone;
+import nl.daylightcraft.hearthstone.PlayerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;

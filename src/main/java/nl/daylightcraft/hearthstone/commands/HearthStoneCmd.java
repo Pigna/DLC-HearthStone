@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myronpigna.hearthstone.commands;
+package nl.daylightcraft.hearthstone.commands;
 
-import com.myronpigna.hearthstone.Cooldown;
-import com.myronpigna.hearthstone.HearthStone;
-import com.myronpigna.hearthstone.Invite;
-import com.myronpigna.hearthstone.PlayerData;
-import net.minecraft.server.v1_16_R3.ChatMessageType;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
+import net.minecraft.network.chat.ChatMessageType;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.game.PacketPlayOutChat;
+import nl.daylightcraft.hearthstone.Cooldown;
+import nl.daylightcraft.hearthstone.HearthStone;
+import nl.daylightcraft.hearthstone.Invite;
+import nl.daylightcraft.hearthstone.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -453,7 +453,7 @@ public class HearthStoneCmd implements CommandExecutor
 
         PacketPlayOutChat packet = new PacketPlayOutChat(
                 IChatBaseComponent.ChatSerializer.a("[\"\",{\"text\":\"[Accept]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Accept HearthStone invite.\",\"color\":\"green\"}]}}},{\"text\":\" or \",\"color\":\"none\",\"bold\":false},{\"text\":\"[Decline]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs decline\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Decline HearthStone invite.\",\"color\":\"red\"}]}}}]"),
-                ChatMessageType.SYSTEM,
+                ChatMessageType.c,
                 UUID.randomUUID()
                 );
         targetpd.sendMessage(player.getName() + " invited you to his HearthStone '" + name + "' will expire in " + hs.getInviteTimeoutSec() + " sec. click a option below:");
@@ -471,7 +471,7 @@ public class HearthStoneCmd implements CommandExecutor
         }
         PacketPlayOutChat packet = new PacketPlayOutChat(
                 IChatBaseComponent.ChatSerializer.a("[" + ClickableHearthStoneList + "]"),
-                ChatMessageType.SYSTEM,
+                ChatMessageType.c,
                 UUID.randomUUID()
         );
         pd.sendMessage(playername + "'s current HearthStone's are:");
@@ -488,7 +488,7 @@ public class HearthStoneCmd implements CommandExecutor
         }
         PacketPlayOutChat packet = new PacketPlayOutChat(
                 IChatBaseComponent.ChatSerializer.a("[" + ClickableHearthStoneList + "]"),
-                ChatMessageType.SYSTEM,
+                ChatMessageType.c,
                 UUID.randomUUID()
         );
         pd.sendMessage("Your current HearthStone's are:");
