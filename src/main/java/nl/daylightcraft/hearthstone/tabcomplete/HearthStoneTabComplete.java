@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.myronpigna.hearthstone.tabcomplete;
+package nl.daylightcraft.hearthstone.tabcomplete;
 
-import com.myronpigna.hearthstone.HearthStone;
-import com.myronpigna.hearthstone.PlayerData;
+import nl.daylightcraft.hearthstone.HearthStone;
+import nl.daylightcraft.hearthstone.PlayerData;
 
 import java.util.ArrayList;
 import java.util.List;

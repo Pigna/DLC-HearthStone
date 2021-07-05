@@ -1,8 +1,10 @@
 .idea/*
-DLC-HearthStone.iml
+*.iml
 nbproject/private/
 build/
 nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/target/
+/out/
