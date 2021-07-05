@@ -5,16 +5,13 @@
  */
 package nl.daylightcraft.hearthstone;
 
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.protocol.game.PacketPlayOutChat;
-import net.minecraft.server.network.PlayerConnection;
-import net.minecraft.network.chat.ChatMessageType;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -103,7 +100,7 @@ public class PlayerData
             if (!hasHome(safename))
                 return false;
         }
-        
+
         Location location = player.getLocation();
         locations.put(safename, location);
         ArrayList<String> values = new ArrayList<String>();
@@ -259,12 +256,6 @@ public class PlayerData
         player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "HS" + ChatColor.DARK_GRAY + "]" + ChatColor.YELLOW + message);
     }
 
-    public void sendChatPacket(PacketPlayOutChat packet)
-    {
-        PlayerConnection targetpConnection = ((CraftPlayer) player).getHandle().b;
-        targetpConnection.sendPacket(packet);
-    }
-
     public void teleportPlayerLocation(String lname, Location l, Cooldown cd, boolean override) //arg 0 use of hearthstone - 1 invite - 4 useother
     {
         //TODO: Use cooldown from player file, instead of the hs list. ERROR needs fixing no cooldown ever registrated or check does not work.
@@ -304,8 +295,7 @@ public class PlayerData
                 {
                     clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + lname + " !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
                 }
-                PacketPlayOutChat packet = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a(clickableOverride), ChatMessageType.c, UUID.randomUUID());
-                sendChatPacket(packet);
+                player.spigot().sendMessage(ChatMessageType.SYSTEM, TextComponent.fromLegacyText(clickableOverride));
             }
             else
             {
