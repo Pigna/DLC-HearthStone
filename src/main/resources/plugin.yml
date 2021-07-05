@@ -1,4 +1,4 @@
-main: com.myronpigna.hearthstone.HearthStone
+main: nl.daylightcraft.hearthstone.HearthStone
 version: 1.0
 name: HearthStone
 authors:
