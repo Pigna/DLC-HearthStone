@@ -5,8 +5,10 @@
  */
 package nl.daylightcraft.hearthstone.commands;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import nl.daylightcraft.hearthstone.Cooldown;
 import nl.daylightcraft.hearthstone.HearthStone;
 import nl.daylightcraft.hearthstone.Invite;
@@ -452,38 +454,54 @@ public class HearthStoneCmd implements CommandExecutor
 
         targetpd.sendMessage(player.getName() + " invited you to his HearthStone '" + name + "' will expire in " + hs.getInviteTimeoutSec() + " sec. click a option below:");
 
-        String message = "[\"\",{\"text\":\"[Accept]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Accept HearthStone invite.\",\"color\":\"green\"}]}}},{\"text\":\" or \",\"color\":\"none\",\"bold\":false},{\"text\":\"[Decline]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs decline\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Decline HearthStone invite.\",\"color\":\"red\"}]}}}]";
-        targetpd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, TextComponent.fromLegacyText(message));
+        BaseComponent[] message = new ComponentBuilder("Add a '!' or click -> ").color(ChatColor.WHITE)
+                .append("[Accept]").color(ChatColor.GREEN).bold(true)
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Accept HearthStone invite.")))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs accept"))
+                .append(" | ").color(ChatColor.GRAY)
+                .append("[Decline]").color(ChatColor.RED).bold(true)
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Decline HearthStone invite.")))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs decline"))
+                .create();
+
+        targetpd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, message);
 
         hs.addInvite(targetpd, pd, name);
     }
 
     private void OtherPlayerHomes(PlayerData tpd, PlayerData pd, String playername)
     {
-        String ClickableHearthStoneList = "\"\"";
+        ComponentBuilder ClickableHearthStoneList = new ComponentBuilder();
+
         //displays list of homes and help
         for (String s : tpd.getHomes().keySet())
         {
-            ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + playername + ":" + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + " from " + playername + ".\"}]}}}";
+            ClickableHearthStoneList.append(" | ").color(ChatColor.GRAY)
+                    .append(s).color(ChatColor.GREEN)
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Use HearthStone to " + s + " from " + playername + ".")))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs " + playername + ":" + s));
         }
 
         pd.sendMessage(playername + "'s current HearthStone's are:");
-        String message = "[" + ClickableHearthStoneList + "]";
-        pd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, TextComponent.fromLegacyText(message));
+        ClickableHearthStoneList.append(" | ").color(ChatColor.GRAY);
+        pd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, ClickableHearthStoneList.create());
     }
 
     private void PlayerHomes(PlayerData pd)
     {
-        String ClickableHearthStoneList = "\"\"";
+        ComponentBuilder ClickableHearthStoneList = new ComponentBuilder();
         //displays list of homes and help
         for (String s : pd.getHomes().keySet())
         {
-            ClickableHearthStoneList = ClickableHearthStoneList + ",{\"text\":\"" + s + " \",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + s + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Use HearthStone to " + s + ".\"}]}}}";
+            ClickableHearthStoneList.append(" | ").color(ChatColor.GRAY)
+                    .append(s).color(ChatColor.GREEN)
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Use HearthStone to " + s + ".")))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs " + s));
         }
 
         pd.sendMessage("Your current HearthStone's are:");
-        String message = "[" + ClickableHearthStoneList + "]";
-        pd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, TextComponent.fromLegacyText(message));
+        ClickableHearthStoneList.append(" | ").color(ChatColor.GRAY);
+        pd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, ClickableHearthStoneList.create());
     }
 
     /**

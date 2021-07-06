@@ -5,9 +5,10 @@
  */
 package nl.daylightcraft.hearthstone;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -286,16 +287,24 @@ public class PlayerData
             else if (!LocationSafeCheck(l) && !override)
             {
                 sendMessage("HearthStone location is not safe for teleport.");
-                String clickableOverride = "";
+                BaseComponent[] clickableOverride;
                 if (cd == Cooldown.ACCEPTED) //TODO deze strings zijn bijna hetzelfde hak ze op in stukken en doe de ef alleen om het stuk dat anders is
                 {
-                    clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs accept !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
+                    clickableOverride = new ComponentBuilder("Add a '!' or click -> ").color(ChatColor.WHITE)
+                            .append("[Override]").color(ChatColor.RED).bold(true)
+                            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Override safety precautions at your own risk!")))
+                            .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs accept !"))
+                            .append(" at your own risk!").color(ChatColor.WHITE).create();
                 }
                 else
                 {
-                    clickableOverride = "[\"\",{\"text\":\"Add a '!' or click -> \",\"color\":\"white\"},{\"text\":\"[Override]\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/hs " + lname + " !\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":[{\"text\":\"Override safety precautions at your own risk!\",\"color\":\"red\"}]}}},{\"text\":\" at your own risk!\",\"color\":\"white\",\"bold\":false}]";
+                    clickableOverride = new ComponentBuilder("Add a '!' or click -> ").color(ChatColor.WHITE)
+                            .append("[Override]").color(ChatColor.RED).bold(true)
+                            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Override safety precautions at your own risk!")))
+                            .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs " + lname + " !"))
+                            .append(" at your own risk!").color(ChatColor.WHITE).create();
                 }
-                player.spigot().sendMessage(ChatMessageType.SYSTEM, TextComponent.fromLegacyText(clickableOverride));
+                player.spigot().sendMessage(ChatMessageType.SYSTEM, clickableOverride);
             }
             else
             {
@@ -360,24 +369,20 @@ public class PlayerData
     {
         if (!player.hasPermission("hearthstone.bypass.cooldown"))
         {
-            switch (cd)
-            {
-                case USAGE://Hearthstone usage
-                    setUsageCooldown();
-                    break;
-                case INVITE://Invite usage
-                    setInviteCooldown();
-                    break;
-                case ACCEPTED://Invite Accept
+            switch (cd) {
+                //Hearthstone usage
+                case USAGE -> setUsageCooldown();
+                //Invite usage
+                case INVITE -> setInviteCooldown();
+                //Invite Accept
+                case ACCEPTED -> {
                     setInviteCooldown();
                     setInviteAcceptCooldown();
-                    break;
-                case SET://Set hS
-                    setInviteCooldown();
-                    break;
-                case OTHER://Use other
-                    setUsageCooldown();
-                    break;
+                }
+                //Set hs
+                case SET -> setInviteCooldown();
+                //Use other
+                case OTHER -> setUsageCooldown();
             }
         }
     }
