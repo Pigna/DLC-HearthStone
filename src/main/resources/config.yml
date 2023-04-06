@@ -2,7 +2,7 @@
 # by Myron_Pigna
 version: 1.0
 # The amount of locations a player with rank can save
-# [rankname : number] example permission needed 'hearthstone.location.gladiator'
+# [rank-name : number] example permission needed 'hearthstone.location.gladiator'
 set-location-amount-default: 1
 set-location-amount:
     gladiator: 2
@@ -16,12 +16,12 @@ teleport-cooldown: 600
 ###Invite
 # Cooldown on using invite after setting new location
 set-location-invite-cooldown: 600
-# Cooldown on using invite after having somone invited
+# Cooldown on using invite after having someone invited
 location-invite-cooldown: 600
-# Cooldown on using invite after accepting a invite
+# Cooldown on using invite after accepting an invitation
 location-invite-accept-cooldown: 600
 
 # Teleport delay before teleport will happen in sec
 teleport-delay: 3
-# The time when a invite will expire in sec
+# The time when an invitation will expire in sec
 invite-timeout: 60

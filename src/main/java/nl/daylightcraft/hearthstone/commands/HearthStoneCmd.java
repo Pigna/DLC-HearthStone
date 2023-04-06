@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  */
 public class HearthStoneCmd implements CommandExecutor
 {
-    private HearthStone hs;
+    private final HearthStone hs;
 
     public HearthStoneCmd(HearthStone hs)
     {
@@ -38,10 +38,13 @@ public class HearthStoneCmd implements CommandExecutor
 
     private void setNewHeartStone(CommandSender sender, String[] args, PlayerData pd)
     {
-        if (!sender.hasPermission("hearthstone.set")) NoPermission(pd);
+        if (!sender.hasPermission("hearthstone.set")) noPermission(pd);
         else if (args.length == 2)
-            if (pd.setHome(args[1])) pd.sendMessage("HearthStone " + args[1] + " is set.");
-            else pd.sendMessage("You have reached your maximum amount of locations.");
+            if (pd.setHome(args[1]))
+                pd.sendMessage("HearthStone " + args[1] + " is set.");
+            else {
+                pd.sendMessage("You have reached your maximum amount of locations.");
+            }
         else pd.sendMessage("Set Syntax : /hs set [name]");
     }
 
@@ -72,7 +75,7 @@ public class HearthStoneCmd implements CommandExecutor
         {
             if (!pd.hasCooldown(Cooldown.ACCEPTED))
             {
-                inviteAccepted.InviteAccepted(override);
+                inviteAccepted.inviteAccepted(override);
                 hs.deleteInvite(player.getName());
             }
             else
@@ -88,7 +91,7 @@ public class HearthStoneCmd implements CommandExecutor
         Invite inviteDeclined = hs.getInvite(player.getName());
         if (inviteDeclined != null)
         {
-            inviteDeclined.InviteDeclined();
+            inviteDeclined.inviteDeclined();
             hs.deleteInvite(player.getName());
         }
         else
@@ -101,7 +104,7 @@ public class HearthStoneCmd implements CommandExecutor
     {
         if (!sender.hasPermission("hearthstone.invite"))
         {
-            NoPermission(pd);
+            noPermission(pd);
         }
         else if (args.length == 1)
         {
@@ -123,7 +126,7 @@ public class HearthStoneCmd implements CommandExecutor
                     }
                     else if (!pd.hasCooldown(Cooldown.INVITE))
                     {
-                        SendInvite(targetPlayer, player, pd, pd.getHomeName());
+                        sendInvite(targetPlayer, player, pd, pd.getHomeName());
                     }
                     else
                     {
@@ -161,7 +164,7 @@ public class HearthStoneCmd implements CommandExecutor
                 else if (pd.hasHome(args[2]))
                 {
                     pd.sendMessage("Invite has been send to '" + targetPlayer.getName() + "'.");
-                    SendInvite(targetPlayer, player, pd, args[2]);
+                    sendInvite(targetPlayer, player, pd, args[2]);
                 }
                 else
                 {
@@ -200,7 +203,7 @@ public class HearthStoneCmd implements CommandExecutor
                 }
                 else
                 {
-                    OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUUIDfromPlayerListFile(args[1]));
+                    OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(hs.getUuidFromPlayerListFile(args[1]));
                     if (targetOfflinePlayer == null) pd.sendMessage("No player with that name exists.");
                     else if (!targetOfflinePlayer.hasPlayedBefore())
                         pd.sendMessage("That player has never played on this server before.");
@@ -219,7 +222,7 @@ public class HearthStoneCmd implements CommandExecutor
         }
         else
         {
-            NoPermission(pd);
+            noPermission(pd);
         }
     }
 
@@ -227,7 +230,7 @@ public class HearthStoneCmd implements CommandExecutor
     {
         if (!sender.hasPermission("hearthstone.reset"))
         {
-            NoPermission(pd);
+            noPermission(pd);
         }
         else if (args.length == 2)
         {
@@ -236,8 +239,8 @@ public class HearthStoneCmd implements CommandExecutor
             {
                 PlayerData targetPlayerData = hs.getPlayerData(targetPlayer);
                 targetPlayerData.resetCooldown();
-                pd.sendMessage(args[1] + "\'s cooldowns have been reset.");
-                targetPlayerData.sendMessage("Your cooldowns have been reset.");
+                pd.sendMessage(args[1] + "'s cool-downs have been reset.");
+                targetPlayerData.sendMessage("Your cool-downs have been reset.");
             }
             else
             {
@@ -264,23 +267,23 @@ public class HearthStoneCmd implements CommandExecutor
                     Player targetPlayer = hs.getServer().getPlayer(input[0]);
                     if (targetPlayer != null)
                     {
-                        OtherPlayerData(pd, input, targetPlayer, override);
+                        otherPlayerData(pd, input, targetPlayer, override);
                     }
                     else
                     {
-                        OtherOfflinePlayerData(pd, input, override);
+                        otherOfflinePlayerData(pd, input, override);
                     }
                 }
                 else
                 {
-                    NoPermission(pd);
+                    noPermission(pd);
                 }
             }
             else if (pd.hasHome(homeName))
             {
                 pd.teleportPlayerLocation(homeName, pd.getHomeLocation(homeName), Cooldown.USAGE, override);
             }
-            else // error
+            else
             {
                 pd.sendMessage("You have no HearthStone with that name.");
             }
@@ -289,22 +292,22 @@ public class HearthStoneCmd implements CommandExecutor
         {
             pd.teleportPlayerLocation(args[0], pd.getHomeLocation(), Cooldown.USAGE, override);
         }
-        else if (pd.hasHome() > 1) //error
+        else if (pd.hasHome() > 1)
         {
             pd.sendMessage("Give a HearthStone name as parameter.");
         }
-        else//error
+        else
         {
             pd.sendMessage("You have no HearthStone set. View /hs help for extra information.");
         }
     }
 
-    private void OtherPlayerData (PlayerData pd, String[] input, Player targetPlayer, Boolean override)
+    private void otherPlayerData(PlayerData pd, String[] input, Player targetPlayer, Boolean override)
     {
         PlayerData targetPlayerData = hs.getPlayerData(targetPlayer);
         if (input.length == 1)
         {
-            OtherPlayerHomes(targetPlayerData, pd, input[0]);
+            otherPlayerHomes(targetPlayerData, pd, input[0]);
         }
         else if (!targetPlayerData.hasHome(input[1]))
         {
@@ -316,14 +319,14 @@ public class HearthStoneCmd implements CommandExecutor
         }
     }
     
-    private void OtherOfflinePlayerData (PlayerData pd, String[] input, Boolean override)
+    private void otherOfflinePlayerData(PlayerData pd, String[] input, Boolean override)
     {
         try
         {
-            UUID uuid = hs.getUUIDfromPlayerListFile(input[0]);
+            UUID uuid = hs.getUuidFromPlayerListFile(input[0]);
             if (uuid == null)
             {
-                pd.sendMessage("Player name does not match any known playernames.");
+                pd.sendMessage("Player name does not match any known player names.");
                 return;
             }
             OfflinePlayer targetOfflinePlayer = hs.getServer().getOfflinePlayer(uuid);
@@ -340,7 +343,7 @@ public class HearthStoneCmd implements CommandExecutor
                 PlayerData targetPlayerData = new PlayerData(targetOfflinePlayer, hs);
                 if (input.length == 1)
                 {
-                    OtherPlayerHomes(targetPlayerData, pd, input[0]);
+                    otherPlayerHomes(targetPlayerData, pd, input[0]);
                 }
                 else if (!targetPlayerData.hasHome(input[1]))
                 {
@@ -372,7 +375,7 @@ public class HearthStoneCmd implements CommandExecutor
         PlayerData pd = hs.getPlayerData(player);
         if (!sender.hasPermission("hearthstone.use"))
         {
-            NoPermission(pd);
+            noPermission(pd);
             return false;
         }
 
@@ -380,7 +383,7 @@ public class HearthStoneCmd implements CommandExecutor
         {
             if (pd.hasHome() > 0)
             {
-                PlayerHomes(pd);
+                playerHomes(pd);
                 return true;
             }
 
@@ -390,25 +393,15 @@ public class HearthStoneCmd implements CommandExecutor
 
         if (args.length >= 1)
         {
-            switch (args[0].toLowerCase())
-            {
-                case "set":
-                    //Set new Hearthstone
+            switch (args[0].toLowerCase()) {
+                case "set" -> //Set new Hearthstone
                     setNewHeartStone(sender, args, pd);
-                    break;
-                case "delete"://Deletes current hearthstone
-                case "del":  //Alias for delete
+                case "delete", "del" -> //Deletes current hearthstone
                     deleteHearthStone(args, pd);
-                    break;
-                case "accept":
-                    //accepts heartstone
+                case "accept" -> //accepts hearthstone
                     acceptHeartStone(args, player, pd);
-                    break;
-                case "decline":
-                    declineHeartStone(player, pd);
-                    break;
-                case "help":
-                case "h":
+                case "decline" -> declineHeartStone(player, pd);
+                case "help", "h" -> {
                     //View info about hearthstone
                     pd.sendMessage("- /hs - To see your current HearthStone(hs) locations");
                     pd.sendMessage("- /hs set [name] - To set a HearthStone location with a name");
@@ -417,42 +410,30 @@ public class HearthStoneCmd implements CommandExecutor
                     pd.sendMessage("- /hs accept - To accept a HearthStone invite");
                     pd.sendMessage("- /hs decline - To decline a HearthStone invite");
                     pd.sendMessage("- /hs info - Information about the creator of the HearthStone plugin and its features");
-                    break;
-                case "invite":
-                case "inv":
-                    inviteHeartStone(sender, args, player, pd);
-                    break;
-                case "request":
-                case "req":
-                    //TODO: Send request to player to go to his home
-                    //pd.sendMessage("Request Syntax : /hs request [Player name]");
+                }
+                case "invite", "inv" -> inviteHeartStone(sender, args, player, pd);
+                case "request", "req" ->
+                    // pd.sendMessage("Request Syntax : /hs request [Player name]");
                     pd.sendMessage("Not in use.");
-                    break;
-                case "info":
+                case "info" -> {
                     pd.sendMessage("This plugin [HearthStone] is created by Myron Antonissen for the DayLightCraft server.");
                     pd.sendMessage("HearthStone is a 'home' plugin to save locations and to be able to return to them, while also being able to invite other players to the location.");
-                    break;
-                case "reset":
-                    //Resets the cooldowns of a player
+                }
+                case "reset" -> //Resets the cool-downs of a player
                     resetHeartStone(sender, args, pd);
-                    break;
-                case "locate":
-                    //Get the location of a set HS of a player
+                case "locate" -> //Get the location of a set HS of a player
                     locateHeartStone(args, player, pd);
-                    break;
-                default:
-                    defaultHeartStone(args, player, pd);
-                    break;
+                default -> defaultHeartStone(args, player, pd);
             }
         }
         return true;
     }
 
-    private void SendInvite(Player pTarget, Player player, PlayerData pd, String name)
+    private void sendInvite(Player pTarget, Player player, PlayerData pd, String name)
     {
-        PlayerData targetpd = hs.getPlayerData(pTarget);
+        PlayerData targetPlayerData = hs.getPlayerData(pTarget);
 
-        targetpd.sendMessage(player.getName() + " invited you to his HearthStone '" + name + "' will expire in " + hs.getInviteTimeoutSec() + " sec. click a option below:");
+        targetPlayerData.sendMessage(player.getName() + " invited you to his HearthStone '" + name + "' will expire in " + hs.getInviteTimeoutSec() + " sec. click a option below:");
 
         BaseComponent[] message = new ComponentBuilder("Add a '!' or click -> ").color(ChatColor.WHITE)
                 .append("[Accept]").color(ChatColor.GREEN).bold(true)
@@ -464,12 +445,12 @@ public class HearthStoneCmd implements CommandExecutor
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hs decline"))
                 .create();
 
-        targetpd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, message);
+        targetPlayerData.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, message);
 
-        hs.addInvite(targetpd, pd, name);
+        hs.addInvite(targetPlayerData, pd, name);
     }
 
-    private void OtherPlayerHomes(PlayerData tpd, PlayerData pd, String playername)
+    private void otherPlayerHomes(PlayerData tpd, PlayerData pd, String playername)
     {
         ComponentBuilder ClickableHearthStoneList = new ComponentBuilder();
 
@@ -487,7 +468,7 @@ public class HearthStoneCmd implements CommandExecutor
         pd.getPlayer().spigot().sendMessage(ChatMessageType.SYSTEM, ClickableHearthStoneList.create());
     }
 
-    private void PlayerHomes(PlayerData pd)
+    private void playerHomes(PlayerData pd)
     {
         ComponentBuilder ClickableHearthStoneList = new ComponentBuilder();
         //displays list of homes and help
@@ -509,7 +490,7 @@ public class HearthStoneCmd implements CommandExecutor
      *
      * @pd is needed to send the player the message with layout template.
      */
-    private void NoPermission(PlayerData pd)
+    private void noPermission(PlayerData pd)
     {
         pd.sendMessage("You have no permission to use this HearthStone command.");
     }

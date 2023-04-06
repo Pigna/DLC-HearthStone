@@ -23,12 +23,12 @@ public class PlayerJoin implements Listener{
     }
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        //Load data from file and add player to playerlist
+        //Load data from file and add player to player list
         hs.playerList.add(new PlayerData(event.getPlayer(),hs));
         //Set the player in the PlayerListFile if not in it already
-        if(hs.getUUIDfromPlayerListFile(event.getPlayer().getUniqueId().toString()) == null)
+        if(hs.getUuidFromPlayerListFile(event.getPlayer().getUniqueId().toString()) == null)
         {
-            hs.addtoPlayerListFile(event.getPlayer());
+            hs.addToPlayerListFile(event.getPlayer());
         }
     }
 }

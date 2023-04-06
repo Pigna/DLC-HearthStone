@@ -23,7 +23,7 @@ public class PlayerQuit implements Listener{
     }
     @EventHandler
     public void onPlayerLeaveEvent(PlayerQuitEvent event){
-        //remove player from playerlist
+        //remove player from player list
         PlayerData pd = hs.getPlayerData(event.getPlayer());
         if(pd != null)
         {

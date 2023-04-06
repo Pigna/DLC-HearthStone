@@ -9,6 +9,7 @@ import nl.daylightcraft.hearthstone.HearthStone;
 import nl.daylightcraft.hearthstone.PlayerData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.Command;
@@ -31,61 +32,58 @@ public class HearthStoneTabComplete implements TabCompleter
     /**
      * AutoComplete commands when tab is pressed
      *
-     * @param sender
-     * @param cmd
-     * @param commandLabel
-     * @param args
-     * @return
+     * @param sender Player or Console
+     * @param cmd Command used
+     * @param commandLabel a
+     * @param args Arguments given
+     * @return A list of suggestions
      */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args)
     {
-        if (cmd.getName().equalsIgnoreCase("hs") || cmd.getName().equalsIgnoreCase("hearthstone"))
+        if (!cmd.getName().equalsIgnoreCase("hs") && !cmd.getName().equalsIgnoreCase("hearthstone")) {
+            return Collections.emptyList();
+        }
+        if (!(sender instanceof Player))
         {
-            if (!(sender instanceof Player))
-            {
-                sender.sendMessage("TabComplete is not for console.");
-                return null;
-            }
+            sender.sendMessage("TabComplete is not for console.");
+            return Collections.emptyList();
+        }
 
-            Player player = (Player) sender;
-            PlayerData pd = hs.getPlayerData(player);
-            ArrayList<String> autoComplete = new ArrayList<>();
-            if (args.length == 1)
+        Player player = (Player) sender;
+        PlayerData pd = hs.getPlayerData(player);
+        ArrayList<String> autoComplete = new ArrayList<>();
+        if (args.length == 1)
+        {
+            //Adds homes that starts with arg
+            autoComplete.addAll(pd.getHomeList(args[0]));
+            autoComplete.addAll(defaultCommands(args[0]));
+        }
+        if (args.length >= 2)
+        {
+            switch (args[0].toLowerCase())
             {
-                //Addes homes that starts with arg
-                autoComplete.addAll(pd.getHomeList(args[0]));
-                autoComplete.addAll(DefaultCommands(args[0]));
-            }
-            if (args.length >= 2)
-            {
-                switch (args[0].toLowerCase())
-                {
-                    case "delete":
-                    case "del":
+                case "delete", "del" ->
+                    //return list of current homes
+                    autoComplete.addAll(pd.getHomeList(args[1]));
+                case "invite", "inv" -> {
+                    if (args.length == 2)
+                    {
+                        //return list of current online players names
+                        autoComplete.addAll(hs.getOnlinePlayerNames(args[1]));
+                    }
+                    else if (args.length == 3)
+                    {
                         //return list of current homes
-                        autoComplete.addAll(pd.getHomeList(args[1]));
-                        break;
-                    case "invite":
-                    case "inv":
-                        if(args.length == 2)
-                        {
-                            //return list of current online players names
-                            autoComplete.addAll(hs.getOnlinePlayerNames(args[1]));
-                        }
-                        else if(args.length == 3)
-                        {
-                            //return list of current homes
-                            autoComplete.addAll(pd.getHomeList(args[2]));
-                        }
-                        break;
-                    default:
-                        break;
+                        autoComplete.addAll(pd.getHomeList(args[2]));
+                    }
+                }
+                default -> {
+
                 }
             }
-            return autoComplete;
         }
-        return null;
+        return autoComplete;
     }
 
     /**
@@ -94,7 +92,7 @@ public class HearthStoneTabComplete implements TabCompleter
      * @param arg String commands starts with. Give empty string for full list
      * @return List of commands starting with arg
      */
-    private ArrayList<String> DefaultCommands(String arg)
+    private ArrayList<String> defaultCommands(String arg)
     {
         //Default commands for player
         ArrayList<String> mainCommands = new ArrayList<>();

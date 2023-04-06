@@ -31,17 +31,15 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class HearthStone extends JavaPlugin
 {
-    public ArrayList<PlayerData> playerList = new ArrayList<>();
+    public List<PlayerData> playerList = new ArrayList<>();
     private final HashMap<String, Invite> currentInvites = new HashMap<>();
     private final HashMap<String, Integer> rankLocationAmount = new HashMap<>();
     private File playerListFile;
     private YamlConfiguration playerListConfig;
-    private List<Material> materialList;// Arrays.asList(Material.WOOD_STEP, Material.WOOD_STAIRS, Material.STONE_SLAB2, Material.ACACIA_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.DARK_OAK_STAIRS, Material.SNOW, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS, Material.IRON_PLATE, Material.WOOD_PLATE, Material.BED, Material.CHEST, Material.CAULDRON, Material.HOPPER, Material.DAYLIGHT_DETECTOR, Material.DAYLIGHT_DETECTOR_INVERTED, Material.TRAP_DOOR, Material.IRON_TRAPDOOR, Material.TRAPPED_CHEST, Material.STONE_PLATE, Material.GOLD_PLATE, Material.SANDSTONE_STAIRS, Material.NETHER_BRICK_STAIRS, Material.PURPUR_SLAB, Material.PURPUR_STAIRS, Material.STEP, Material.SOUL_SAND, Material.GRASS_PATH, Material.SOIL);
+    private List<Material> materialList;
 
     public HearthStone() {
-//        Stream.Of()
-
-        //materialList = Stream.of(Material.values()).filter(Material::isSolid).collect(Collectors.toList());
+        // Constructor
     }
 
     @Override
@@ -118,7 +116,7 @@ public class HearthStone extends JavaPlugin
         return getConfig().getInt("set-location-invite-cooldown", 600);
     }
 
-    //Invite Cooldown after sending a invite
+    //Invite Cooldown after sending an invitation
     public int getLocationInviteCooldownTick()
     {
         return getLocationInviteCooldownSec() * 20;
@@ -129,7 +127,7 @@ public class HearthStone extends JavaPlugin
         return getConfig().getInt("location-invite-cooldown", 600);
     }
 
-    //Invite Cooldown after sending a invite
+    //Invite Cooldown after sending an invitation
     public int getLocationInviteAcceptCooldownTick()
     {
         return getLocationInviteAcceptCooldownSec() * 20;
@@ -142,19 +140,13 @@ public class HearthStone extends JavaPlugin
 
     public int getCooldownSec(Cooldown cooldown)
     {
-        switch(cooldown)
-        {
-            case USAGE:
-                return getTPCooldownSec();
-            case INVITE:
-                return getLocationInviteCooldownSec();
-            case ACCEPTED:
-                return getLocationInviteAcceptCooldownSec();
-            case SET:
-                return getSetLocationInviteCooldownSec();
-            default:
-                return getTPCooldownSec();
-        }
+        return switch (cooldown) {
+            case USAGE -> getTPCooldownSec();
+            case INVITE -> getLocationInviteCooldownSec();
+            case ACCEPTED -> getLocationInviteAcceptCooldownSec();
+            case SET -> getSetLocationInviteCooldownSec();
+            default -> getTPCooldownSec();
+        };
     }
     
     public int getRankLocationAmount(String rank)
@@ -165,9 +157,10 @@ public class HearthStone extends JavaPlugin
 
     public int getRankLocationAmount(Player player)
     {
-        for (String rank : rankLocationAmount.keySet())
+        for (Map.Entry<String, Integer> rank : rankLocationAmount.entrySet())
         {
-            if (player.hasPermission("hearthstone.location." + rank)) return rankLocationAmount.get(rank);
+            if (player.hasPermission("hearthstone.location." + rank.getKey()))
+                return rankLocationAmount.get(rank.getKey());
         }
         return getRankLocationAmountDefault();
     }
@@ -223,13 +216,20 @@ public class HearthStone extends JavaPlugin
 
     public String getTimeRemaining(Long time, Cooldown cooldownType)
     {
-        long maxWait = getCooldownSec(cooldownType) * 1000;
+        long maxWait = getCooldownSec(cooldownType) * 1000L;
         long diff = maxWait - (System.currentTimeMillis() - time);
         long seconds = diff / 1000 % 60;
         long minutes = diff / (60 * 1000) % 60;
         long hours = diff / (60 * 60 * 1000);
 
-        return hours > 0 ? hours + " Hours " + minutes + " Min " + seconds + " Sec" : minutes > 0 ? minutes + " Min " + seconds + " Sec" : seconds + " Sec";
+        if ((hours > 0)) {
+            return (hours + " Hours " + minutes + " Min " + seconds + " Sec");
+        }
+        else {
+            if (minutes > 0)
+                return minutes + " Min " + seconds + " Sec";
+            return seconds + " Sec";
+        }
     }
 
     public void addCooldown(PlayerData pd, Cooldown usage)
@@ -237,43 +237,39 @@ public class HearthStone extends JavaPlugin
         getServer().getScheduler().scheduleSyncDelayedTask(this, () ->
         {
             deleteCooldown(pd.getPlayer().getName());
-            switch (usage)
-            {
-                case USAGE://Hearthstone usage
+            switch (usage) {
+                case USAGE ->//Hearthstone usage
                     pd.sendMessage("Your HearthStone is no longer in cooldown.");
-                    break;
-                case SET://Set hS
-                case INVITE://Invite usage
-                case ACCEPTED://Invite Accept
+                case SET,//Set hS
+                    INVITE,//Invite usage
+                    ACCEPTED ->//Invite Accept
                     pd.sendMessage("Your HearthStone invite is no longer in cooldown.");
-                    break;
-                case OTHER://Use other
+                case OTHER ->//Use other
                     pd.sendMessage("A cool down of your Hearthstone has expired.");
-                    break;
             }
         }, getTPCooldownTick());
     }
 
-    public void deleteCooldown(String pname)
+    public void deleteCooldown(String playerName)
     {
-        //TODO: On reset cooldowns remove cooldown message scheduler
+        //TODO: On reset cool-downs remove cooldown message scheduler
     }
 
-    public Invite getInvite(String pname)
+    public Invite getInvite(String playerName)
     {
-        return currentInvites.getOrDefault(pname, null);
+        return currentInvites.getOrDefault(playerName, null);
     }
 
-    public boolean getInviteExists(String pname, Invite invite)
+    public boolean getInviteExists(String playerName, Invite invite)
     {
-        if (currentInvites.containsKey(pname))
-            return currentInvites.get(pname).equals(invite);
+        if (currentInvites.containsKey(playerName))
+            return currentInvites.get(playerName).equals(invite);
 
         return false;
     }
 
     /**
-     * Add a invite to the currentInvite list
+     * Add an invitation to the currentInvite list
      * @param pTarget Player that receives the invite
      * @param sender Player that send the invite
      * @param locationName Location the receiver is invited to
@@ -287,15 +283,15 @@ public class HearthStone extends JavaPlugin
             //Check invite still there.
             if (getInviteExists(pTarget.getPlayer().getName(), newInvite))
             {
-                newInvite.InviteExpired();
+                newInvite.inviteExpired();
                 deleteInvite(pTarget.getPlayer().getName());
             }
         }, getInviteTimeoutTick());
     }
 
-    public void deleteInvite(String pname)
+    public void deleteInvite(String playerName)
     {
-        if (currentInvites.containsKey(pname)) currentInvites.remove(pname);
+        currentInvites.remove(playerName);
     }
 
     /**
@@ -309,7 +305,8 @@ public class HearthStone extends JavaPlugin
 
             try
             {
-                playerListFile.createNewFile();
+                if(playerListFile.createNewFile())
+                    Logger.getLogger(HearthStone.class.getName()).log(Level.INFO, "Player list file created.");
             }
             catch (IOException ex)
             {
@@ -324,7 +321,7 @@ public class HearthStone extends JavaPlugin
      * Add Player to the playerListFile to be able to get the UUID when he is offline
      * @param player Player to add to the file
      */
-    public void addtoPlayerListFile(Player player)
+    public void addToPlayerListFile(Player player)
     {
         playerListConfig.set("players." + player.getName(), player.getUniqueId().toString());
         try
@@ -342,7 +339,7 @@ public class HearthStone extends JavaPlugin
      * @param playerName Name of the player
      * @return UUID of given player's name
      */
-    public UUID getUUIDfromPlayerListFile(String playerName)
+    public UUID getUuidFromPlayerListFile(String playerName)
     {
         ConfigurationSection playerSection = playerListConfig.getConfigurationSection("players");
         if (playerSection != null)
@@ -362,7 +359,7 @@ public class HearthStone extends JavaPlugin
      * @param arg beginning of a name or leave empty
      * @return ArrayList<String> containing names of all online players starting with arg
      */
-    public ArrayList<String> getOnlinePlayerNames(String arg)
+    public List<String> getOnlinePlayerNames(String arg)
     {
         ArrayList<String> playerNames = new ArrayList<>();
         if(!arg.isEmpty())

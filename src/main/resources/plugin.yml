@@ -4,7 +4,7 @@ name: HearthStone
 authors:
     - Myron-Pigna
 description: Use HearthStone or Hs to return to locations or invite players to them.
-api-version: '1.16'
+api-version: '1.19'
 commands:
     hearthstone:
         description: Return home.
@@ -57,5 +57,5 @@ permissions:
         description: Gets the location of a players HearthStone
         default: op
     hearthstone.reset:
-        description: Resets the cooldowns of a player
+        description: Resets the cool-downs of a player
         default: op

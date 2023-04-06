@@ -29,7 +29,6 @@ import org.bukkit.block.Block;
  */
 public class PlayerData
 {
-    private YamlConfiguration DataFile;
     private final HearthStone hs;
     private final File pluginFolder;
     private final File playerDataFolder;
@@ -46,7 +45,7 @@ public class PlayerData
         this.playerDataFolder = hs.getPlayerDataFolder();
         this.dataFile = new File(playerDataFolder, player.getUniqueId() + ".yml");
         CreateFile();
-        LoadFile();
+        loadFile();
     }
 
     public PlayerData(OfflinePlayer offlinePlayer, HearthStone hs)
@@ -55,7 +54,7 @@ public class PlayerData
         this.pluginFolder = hs.getDataFolder();
         this.playerDataFolder = hs.getPlayerDataFolder();
         this.dataFile = new File(playerDataFolder, offlinePlayer.getUniqueId() + ".yml");
-        LoadFile();
+        loadFile();
     }
 
     public Player getPlayer()
@@ -69,18 +68,15 @@ public class PlayerData
     }
     /**
      * Gets homes that starts with arg
-     * @param arg
+     * @param arg Input
      * @return List of home names that start with arg
      */
-    public ArrayList<String> getHomeList(String arg)
+    public List<String> getHomeList(String arg)
     {
         ArrayList<String> returnList = new ArrayList<>();
         if(arg.equals(""))
         {
-            for(String s : locations.keySet())
-            {
-                returnList.add(s);
-            }
+            returnList.addAll(locations.keySet());
             return returnList;
         }
         for(String s : locations.keySet())
@@ -92,37 +88,37 @@ public class PlayerData
         }
         return returnList;
     }
-    //World world, float x, float y, float z, double yaw, double pitch
+
     public boolean setHome(String name)
     {
-        String safename = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        String safeName = name.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
         if (hasHome() >= hs.getRankLocationAmount(player) && !player.hasPermission("hearthstone.bypass.homes"))
         {
-            if (!hasHome(safename))
+            if (!hasHome(safeName))
                 return false;
         }
 
         Location location = player.getLocation();
-        locations.put(safename, location);
-        ArrayList<String> values = new ArrayList<String>();
+        locations.put(safeName, location);
+        ArrayList<String> values = new ArrayList<>();
         values.add(location.getWorld().getName());
-        values.add(location.getX() + "");
-        values.add(location.getY() + "");
-        values.add(location.getZ() + "");
-        values.add(location.getYaw() + "");
-        values.add(location.getPitch() + "");
-        playerDataConfig.set("location." + safename, values);
+        values.add(String.valueOf(location.getX()));
+        values.add(String.valueOf(location.getY()));
+        values.add(String.valueOf(location.getZ()));
+        values.add(String.valueOf(location.getYaw()));
+        values.add(String.valueOf(location.getPitch()));
+        playerDataConfig.set("location." + safeName, values);
         try
         {
             playerDataConfig.save(dataFile);
         }
         catch (IOException ex)
         {
-            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving new home into player file. '" + player.getName() + "' '" + safename + "'", ex);
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error saving new home into player file.", ex);
             return false;
         }
         //Set cooldown on set.
-        SetCooldown(Cooldown.SET);
+        setCooldown(Cooldown.SET);
         return true;
     }
 
@@ -172,7 +168,7 @@ public class PlayerData
         }
         catch (IOException ex)
         {
-            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing home from player file. '" + player.getName() + "' '" + name + "'", ex);
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing home from player file", ex);
             return false;
         }
         return true;
@@ -196,13 +192,12 @@ public class PlayerData
             try
             {
 
-                dataFile.createNewFile();
-                //TODO: check config if new player message is true;
-                sendMessage("This server is using the plugin HearthStone to replace 'homes'. Type /hs help for more information.");
+                if(dataFile.createNewFile())
+                    sendMessage("This server is using the plugin HearthStone to replace 'homes'. Type /hs help for more information.");
             }
             catch (IOException ex)
             {
-                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error creating playerfile", ex);
+                Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error creating player file", ex);
             }
         }
         playerDataConfig = YamlConfiguration.loadConfiguration(dataFile);
@@ -213,38 +208,38 @@ public class PlayerData
         }
         catch (IOException ex)
         {
-            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error updating playername onload : " + player.getName(), ex);
+            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error updating player name on load", ex);
         }
     }
 
-    public void LoadFile()
+    public void loadFile()
     {
         if (dataFile.exists())
         {
             playerDataConfig = YamlConfiguration.loadConfiguration(dataFile);
             //Load the locations and add them to the list
-            if (playerDataConfig.getConfigurationSection("location") != null)
+            if (playerDataConfig.getConfigurationSection("location") == null) {
+                return;
+            }
+            for (String lName : playerDataConfig.getConfigurationSection("location").getKeys(false))
             {
-                for (String lName : playerDataConfig.getConfigurationSection("location").getKeys(false))
+                ArrayList<String> lInfo = (ArrayList<String>) playerDataConfig.getStringList("location." + lName);
+                World world = hs.getServer().getWorld(lInfo.get(0));
+                if (world != null)
                 {
-                    ArrayList<String> lInfo = (ArrayList<String>) playerDataConfig.getStringList("location." + lName);
-                    World world = hs.getServer().getWorld(lInfo.get(0));
-                    if (world != null)
+                    Location location = new Location(hs.getServer().getWorld(lInfo.get(0)), Double.parseDouble(lInfo.get(1)), Double.parseDouble(lInfo.get(2)), Double.parseDouble(lInfo.get(3)), Float.parseFloat(lInfo.get(4)), Float.parseFloat(lInfo.get(5)));
+                    locations.put(lName, location);
+                }
+                else
+                {
+                    playerDataConfig.set("location." + lName, null);
+                    try
                     {
-                        Location location = new Location(hs.getServer().getWorld(lInfo.get(0)), Double.parseDouble(lInfo.get(1)), Double.parseDouble(lInfo.get(2)), Double.parseDouble(lInfo.get(3)), Float.parseFloat(lInfo.get(4)), Float.parseFloat(lInfo.get(5)));
-                        locations.put(lName, location);
+                        playerDataConfig.save(dataFile);
                     }
-                    else
+                    catch (IOException ex)
                     {
-                        playerDataConfig.set("location." + lName, null);
-                        try
-                        {
-                            playerDataConfig.save(dataFile);
-                        }
-                        catch (IOException ex)
-                        {
-                            Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing location from non-existing world from saved hearthstones", ex);
-                        }
+                        Logger.getLogger(HearthStone.class.getName()).log(Level.SEVERE, "IOException : Error removing location from non-existing world from saved hearthstones", ex);
                     }
                 }
             }
@@ -271,7 +266,7 @@ public class PlayerData
         if (player.hasPermission("hearthstone.bypass.delay"))
         {
             player.teleport(l);
-            SetCooldown(cd);
+            setCooldown(cd);
             return;
         }
 
@@ -284,7 +279,7 @@ public class PlayerData
             {
                 sendMessage("You have moved. Teleport is canceled.");
             }
-            else if (!LocationSafeCheck(l) && !override)
+            else if (!locationSafeCheck(l) && !override)
             {
                 sendMessage("HearthStone location is not safe for teleport.");
                 BaseComponent[] clickableOverride;
@@ -309,63 +304,57 @@ public class PlayerData
             else
             {
                 player.teleport(l);
-                SetCooldown(cd);
+                setCooldown(cd);
             }
         }, hs.getTPDelayTick());
-        //TODO: Check combat on teleport Delay
     }
 
-    private boolean LocationSafeCheck(Location loc)
+    private boolean locationSafeCheck(Location loc)
     {
         Location locOther = new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY() + 1, loc.getBlockZ());
         Block block = locOther.getBlock();
         //check head location
-        if (!CheckBlockType(block, Material.AIR))
+        if (!checkBlockType(block, Material.AIR))
         {
             return false;
         }
         //check feet
         locOther.setY(locOther.getY() - 1);
         block = locOther.getBlock();
-        if (CheckBlockType(block, Material.AIR) || CheckBlockType(block, Material.WATER))
+        if (checkBlockType(block, Material.AIR) || checkBlockType(block, Material.WATER))
         {
-            //check underneeth
+            //check underneath
             locOther.setY(locOther.getY() - 1);
             block = locOther.getBlock();
-            return !(CheckBlockType(block, Material.AIR) || block.isLiquid());
+            return !(checkBlockType(block, Material.AIR) || block.isLiquid());
         }
         //check feet for slabs or stairs or carpet or fence
-        if (IsSlabUnsolid(block))
+        if (isSlabNotSolid(block))
         {
             //Check above head for air
             locOther.setY(locOther.getY() + 2);
             block = locOther.getBlock();
-            return CheckBlockType(block, Material.AIR);
+            return checkBlockType(block, Material.AIR);
         }
 
         return false;
-        /*
-        1 rood is air
-        2 bruin is air en oranje is niet liquid of air. DAN MAG JE ER HEEN
-        2 of als bruin een block is en niet lava of vuur en geel air. DAN MAG JE ER HEEN
-        */
     }
 
-    private boolean CheckBlockType(Block block, Material expected)
+    private boolean checkBlockType(Block block, Material expected)
     {
         return block.getType().equals(expected);
     }
 
-    private boolean IsSlabUnsolid(Block block)
+    private boolean isSlabNotSolid(Block block)
     {
         Material blockMaterial = block.getType();
         //Solid block
-        if (!blockMaterial.isSolid() && !CheckBlockType(block, (Material.FIRE))) return true;
+        if (!blockMaterial.isSolid() && !checkBlockType(block, (Material.FIRE))) return true;
         List<Material> materialList = hs.getMaterialList();
-        return materialList.stream().anyMatch((m) -> (m.equals(blockMaterial)));
+        return materialList.stream().anyMatch(m -> (m.equals(blockMaterial)));
     }
 
-    public void SetCooldown(Cooldown cd) //arg 0 use of hearthstone - 1 invite - 2 inviteAccept - 3 setHS - 4 useother
+    public void setCooldown(Cooldown cd) //arg 0 use of hearthstone - 1 invite - 2 inviteAccept - 3 setHS - 4 useother
     {
         if (!player.hasPermission("hearthstone.bypass.cooldown"))
         {
@@ -389,39 +378,26 @@ public class PlayerData
 
     public boolean hasCooldown(Cooldown cd)
     {
-        long wait_time = getCooldown(cd);
+        long waitTime = getCooldown(cd);
 
-        switch (cd)
-        {
-            case USAGE:
-                wait_time += (hs.getTPCooldownSec() * 1000);
-                break;
-            case INVITE:
-                wait_time += (hs.getSetLocationInviteCooldownSec() * 1000);
-                break;
-            case ACCEPTED:
-                wait_time += (hs.getLocationInviteAcceptCooldownSec() * 1000);
-                break;
-            default: //TODO Extend with other cooldowns;
-                return false;
+        switch (cd) {
+            case USAGE -> waitTime += (hs.getTPCooldownSec() * 1000L);
+            case INVITE -> waitTime += (hs.getSetLocationInviteCooldownSec() * 1000L);
+            case ACCEPTED -> waitTime += (hs.getLocationInviteAcceptCooldownSec() * 1000L);
+            default -> {return false;}
         }
 
-        return System.currentTimeMillis() <= wait_time;
+        return System.currentTimeMillis() <= waitTime;
     }
 
     public long getCooldown(Cooldown cd)
     {
-        switch (cd)
-        {
-            case USAGE:
-                return getUsageCooldown();
-            case INVITE:
-                return getInviteCooldown();
-            case ACCEPTED:
-                return getInviteAcceptCooldown();
-            default:
-                return 0;
-        }
+        return switch (cd) {
+            case USAGE -> getUsageCooldown();
+            case INVITE -> getInviteCooldown();
+            case ACCEPTED -> getInviteAcceptCooldown();
+            default -> 0;
+        };
     }
 
     public void resetCooldown()

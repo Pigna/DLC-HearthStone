@@ -46,21 +46,21 @@ public class Invite implements Comparable<Invite>
         return locationName;
     }
 
-    public void InviteExpired()
+    public void inviteExpired()
     {
         receiver.sendMessage(getSender().getName() + "'s invite to " + locationName + " has expired.");
         sender.sendMessage("Your invite to " + getReceiver().getName() + " has expired.");
     }
 
-    public void InviteAccepted(boolean override)
+    public void inviteAccepted(boolean override)
     {
         receiver.sendMessage("You have accepted the HearthStone invite from " + getSender().getName() + ".");
         sender.sendMessage(getReceiver().getName() + " has accepted your HearthStone invite.");
         receiver.teleportPlayerLocation(locationName, location, Cooldown.ACCEPTED, override);
-        sender.SetCooldown(Cooldown.INVITE);
+        sender.setCooldown(Cooldown.INVITE);
     }
 
-    public void InviteDeclined()
+    public void inviteDeclined()
     {
         receiver.sendMessage("You have declined the HearthStone invite from " + getSender().getName() + ".");
         sender.sendMessage(getReceiver().getName() + " has declined your HearthStone invite.");
@@ -74,5 +74,15 @@ public class Invite implements Comparable<Invite>
         if (getLocation().equals(o.getLocation())) return -1;
         if (!getLocationName().equals(o.getLocationName())) return -1;
         return 1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
